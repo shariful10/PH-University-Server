@@ -2,9 +2,11 @@ import { Schema, model } from "mongoose";
 import validator from "validator";
 
 import {
+  StudentModel,
   TGuardian,
   TLocalGuardian,
   TStudent,
+  TStudentMethods,
   TUserName,
 } from "./student.interface";
 
@@ -49,7 +51,7 @@ const GuardianSchema = new Schema<TGuardian>({
   motherOccupation: { type: String, required: true },
 });
 
-const studentSchema = new Schema<TStudent>({
+const studentSchema = new Schema<TStudent, StudentModel, TStudentMethods>({
   id: { type: String, required: true, unique: true },
   name: { type: UserNameSchema, required: true },
   email: {
@@ -86,4 +88,9 @@ const studentSchema = new Schema<TStudent>({
   isActive: { type: String, enum: ["active", "blocked"], default: "active" },
 });
 
-export const StudentModel = model<TStudent>("Student", studentSchema);
+studentSchema.methods.isUserExists = async function (id: string) {
+  const existingUser = await Student.findOne({ id });
+  return existingUser;
+};
+
+export const Student = model<TStudent, StudentModel>("Student", studentSchema);

@@ -5,23 +5,16 @@ import studentValidationSchema from "./student.validation";
 const createStudent = async (req: Request, res: Response) => {
   try {
     const { student: studentData } = req.body;
-    const { error, value } = studentValidationSchema.validate(studentData);
 
-    const result = await StudentServices.createStudentIntoDB(value);
+    const zodParseData = studentValidationSchema.parse(studentData);
+
+    const result = await StudentServices.createStudentIntoDB(zodParseData);
 
     res.status(200).json({
       success: true,
       message: "Student created successfully",
       data: result,
     });
-
-    if (error) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-        error: error,
-      });
-    }
   } catch (err) {
     res.status(500).json({
       success: false,

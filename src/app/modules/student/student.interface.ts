@@ -1,3 +1,5 @@
+import { Model } from "mongoose";
+
 export type TUserName = {
   firstName: string;
   middleName?: string;
@@ -36,3 +38,13 @@ export type TStudent = {
   bloodGroup?: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
   isActive: "active" | "blocked";
 };
+
+export type TStudentMethods = {
+  isUserExists(id: string): Promise<TStudent | null>;
+};
+
+export type StudentModel = Model<
+  TStudent,
+  Record<string, never>,
+  TStudentMethods
+>;
