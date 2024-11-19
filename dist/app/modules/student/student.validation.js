@@ -51,5 +51,6 @@ const studentValidationSchema = zod_1.z.object({
     localGuardian: LocalGuardianValidationSchema,
     bloodGroup: zod_1.z.enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]),
     isActive: zod_1.z.enum(["active", "blocked"]).default("active"),
+    isDeleted: zod_1.z.boolean().default(false),
 });
 exports.default = studentValidationSchema;

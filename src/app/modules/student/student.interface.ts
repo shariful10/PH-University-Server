@@ -38,6 +38,7 @@ export type TStudent = {
   localGuardian: TLocalGuardian;
   bloodGroup?: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
   isActive: "active" | "blocked";
+  isDeleted: boolean;
 };
 
 // For creating static

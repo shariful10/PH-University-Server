@@ -90,6 +90,11 @@ const studentSchema = new mongoose_1.Schema({
         required: true,
     },
     isActive: { type: String, enum: ["active", "blocked"], default: "active" },
+    isDeleted: { type: Boolean, default: false },
+}, { toJSON: { virtuals: true } });
+// Virtuals
+studentSchema.virtual("fullName").get(function () {
+    return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`;
 });
 // Pre save middleware/hook : will work on create() and save()
 studentSchema.pre("save", function (next) {
@@ -103,6 +108,25 @@ studentSchema.pre("save", function (next) {
 studentSchema.post("save", function (doc, next) {
     doc.password = "";
     next();
+});
+// Query middleware/hook
+studentSchema.pre("find", function (next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        this.find({ isDeleted: { $ne: true } });
+        next();
+    });
+});
+studentSchema.pre("findOne", function (next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        this.find({ isDeleted: { $ne: true } });
+        next();
+    });
+});
+studentSchema.pre("aggregate", function (next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+        next();
+    });
 });
 // Custom static method
 studentSchema.statics.isUserExists = function (id) {

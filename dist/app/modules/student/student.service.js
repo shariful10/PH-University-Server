@@ -28,11 +28,17 @@ const getAllStudentsFromDB = () => __awaiter(void 0, void 0, void 0, function* (
     return result;
 });
 const getSingleStudentsFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield student_model_1.Student.findOne({ id });
+    // const result = await Student.findOne({ id });
+    const result = yield student_model_1.Student.aggregate([{ $match: { id } }]);
+    return result;
+});
+const deleteStudentsFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield student_model_1.Student.updateOne({ id }, { isDeleted: true });
     return result;
 });
 exports.StudentServices = {
     createStudentIntoDB,
     getAllStudentsFromDB,
     getSingleStudentsFromDB,
+    deleteStudentsFromDB,
 };
