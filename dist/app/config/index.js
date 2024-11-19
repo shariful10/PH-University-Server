@@ -10,4 +10,5 @@ exports.default = {
     nodeEnv: process.env.NODE_ENV,
     port: process.env.PORT || 5000,
     databaseUrl: process.env.DATABASE_URL,
+    bcryptSaltRounds: process.env.BCRYPT_SALT_ROUNDS,
 };

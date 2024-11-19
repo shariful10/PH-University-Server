@@ -34,6 +34,10 @@ const GuardianValidationSchema = zod_1.z.object({
 });
 const studentValidationSchema = zod_1.z.object({
     id: zod_1.z.string().min(1, "ID is required"),
+    password: zod_1.z
+        .string({ required_error: "Password is required" })
+        .min(6, "Password must be at least 6 characters long")
+        .max(20, "Password can not be more than 20 characters"),
     name: UserNameValidationSchema,
     email: zod_1.z.string().email("Invalid email address"),
     profileImg: zod_1.z.string().optional(),
