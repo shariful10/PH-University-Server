@@ -1,4 +1,5 @@
 import { RequestHandler } from "express";
+import sendResponse from "../../utils/sendResponse";
 import { UserServices } from "./user.service";
 
 const createUser: RequestHandler = async (req, res, next) => {
@@ -12,8 +13,7 @@ const createUser: RequestHandler = async (req, res, next) => {
       studentData,
     );
 
-    res.status(200).json({
-      success: true,
+    sendResponse(res, {
       message: "Student created successfully",
       data: result,
     });

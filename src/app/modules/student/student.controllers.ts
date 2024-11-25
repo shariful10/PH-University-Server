@@ -1,12 +1,12 @@
 import { RequestHandler } from "express";
+import sendResponse from "../../utils/sendResponse";
 import { StudentServices } from "./student.service";
 
 const getAllStudents: RequestHandler = async (req, res, next) => {
   try {
     const result = await StudentServices.getAllStudentsFromDB();
 
-    res.status(200).json({
-      success: true,
+    sendResponse(res, {
       message: "Students are retrieved successfully",
       data: result,
     });
@@ -21,8 +21,7 @@ const getSingleStudent: RequestHandler = async (req, res, next) => {
 
     const result = await StudentServices.getSingleStudentsFromDB(studentId);
 
-    res.status(200).json({
-      success: true,
+    sendResponse(res, {
       message: "Student is retrieved successfully!",
       data: result,
     });
@@ -37,8 +36,7 @@ const deleteStudent: RequestHandler = async (req, res, next) => {
 
     const result = await StudentServices.deleteStudentsFromDB(studentId);
 
-    res.status(200).json({
-      success: true,
+    sendResponse(res, {
       message: "Student is deleted successfully!",
       data: result,
     });
