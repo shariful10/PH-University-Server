@@ -1,8 +1,6 @@
-import bcrypt from "bcrypt";
 import { Schema, model } from "mongoose";
 import validator from "validator";
 
-import config from "../../config";
 import {
   StudentModel,
   TGuardian,
@@ -61,7 +59,6 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       unique: true,
       ref: "User",
     },
-    password: { type: String, required: true },
     name: { type: UserNameSchema, required: true },
     email: {
       type: String,
@@ -103,22 +100,6 @@ studentSchema.virtual("fullName").get(function () {
   return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`;
 });
 
-// Pre save middleware/hook : will work on create() and save()
-studentSchema.pre("save", async function (next) {
-  // Hashing password and save into DB
-  this.password = await bcrypt.hash(
-    this.password,
-    Number(config.bcryptSaltRounds),
-  );
-  next();
-});
-
-// Post save middleware/hook : will work on create() and save()
-studentSchema.post("save", function (doc, next) {
-  doc.password = "";
-  next();
-});
-
 // Query middleware/hook
 studentSchema.pre("find", async function (next) {
   this.find({ isDeleted: { $ne: true } });
@@ -140,11 +121,5 @@ studentSchema.statics.isUserExists = async function (id: string) {
   const existingUser = await Student.findOne({ id });
   return existingUser;
 };
-
-// Custom instance method
-// studentSchema.methods.isUserExists = async function (id: string) {
-//   const existingUser = await Student.findOne({ id });
-//   return existingUser;
-// };
 
 export const Student = model<TStudent, StudentModel>("Student", studentSchema);

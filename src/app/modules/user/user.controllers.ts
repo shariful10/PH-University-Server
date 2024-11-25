@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
+import { RequestHandler } from "express";
 import { UserServices } from "./user.service";
 
-const createUser = async (req: Request, res: Response) => {
+const createUser: RequestHandler = async (req, res, next) => {
   try {
     const { password, student: studentData } = req.body;
 
@@ -18,11 +18,7 @@ const createUser = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: err instanceof Error ? err.message : "something went wrong",
-      error: err,
-    });
+    next(err);
   }
 };
 

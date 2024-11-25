@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
+import { RequestHandler } from "express";
 import { StudentServices } from "./student.service";
 
-const getAllStudents = async (req: Request, res: Response) => {
+const getAllStudents: RequestHandler = async (req, res, next) => {
   try {
     const result = await StudentServices.getAllStudentsFromDB();
 
@@ -11,15 +11,11 @@ const getAllStudents = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: err instanceof Error ? err.message : "something went wrong",
-      error: err,
-    });
+    next(err);
   }
 };
 
-const getSingleStudent = async (req: Request, res: Response) => {
+const getSingleStudent: RequestHandler = async (req, res, next) => {
   try {
     const { studentId } = req.params;
 
@@ -31,15 +27,11 @@ const getSingleStudent = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: err instanceof Error ? err.message : "something went wrong",
-      error: err,
-    });
+    next(err);
   }
 };
 
-const deleteStudent = async (req: Request, res: Response) => {
+const deleteStudent: RequestHandler = async (req, res, next) => {
   try {
     const { studentId } = req.params;
 
@@ -51,11 +43,7 @@ const deleteStudent = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: err instanceof Error ? err.message : "something went wrong",
-      error: err,
-    });
+    next(err);
   }
 };
 
