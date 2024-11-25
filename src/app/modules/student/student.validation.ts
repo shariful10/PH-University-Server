@@ -52,7 +52,6 @@ const studentValidationSchema = z.object({
   guardian: GuardianValidationSchema,
   localGuardian: LocalGuardianValidationSchema,
   bloodGroup: z.enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]),
-  isActive: z.enum(["active", "blocked"]).default("active"),
   isDeleted: z.boolean().default(false),
 });
 

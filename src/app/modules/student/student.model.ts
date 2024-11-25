@@ -55,8 +55,14 @@ const GuardianSchema = new Schema<TGuardian>({
 const studentSchema = new Schema<TStudent, StudentModel>(
   {
     id: { type: String, required: true, unique: true },
-    name: { type: UserNameSchema, required: true },
+    user: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      unique: true,
+      ref: "User",
+    },
     password: { type: String, required: true },
+    name: { type: UserNameSchema, required: true },
     email: {
       type: String,
       required: true,
@@ -87,8 +93,6 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
       required: true,
     },
-
-    isActive: { type: String, enum: ["active", "blocked"], default: "active" },
     isDeleted: { type: Boolean, default: false },
   },
   { toJSON: { virtuals: true } },
