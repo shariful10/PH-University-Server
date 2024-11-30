@@ -1,89 +1,41 @@
-import { Request, Response } from "express";
+import catchAsync from "../../utils/catchAsync";
 import { StudentServices } from "./student.service";
-import studentValidationSchema from "./student.validation";
 
-const createStudent = async (req: Request, res: Response) => {
-  try {
-    const { student: studentData } = req.body;
+const getAllStudents = catchAsync(async (req, res) => {
+  const result = await StudentServices.getAllStudentsFromDB();
 
-    const zodParseData = studentValidationSchema.parse(studentData);
+  res.status(200).json({
+    success: true,
+    message: "Students are retrieved successfully",
+    data: result,
+  });
+});
 
-    const result = await StudentServices.createStudentIntoDB(zodParseData);
+const getSingleStudent = catchAsync(async (req, res) => {
+  const { studentId } = req.params;
 
-    res.status(200).json({
-      success: true,
-      message: "Student created successfully",
-      data: result,
-    });
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: err instanceof Error ? err.message : "something went wrong",
-      error: err,
-    });
-  }
-};
+  const result = await StudentServices.getSingleStudentsFromDB(studentId);
 
-const getAllStudents = async (req: Request, res: Response) => {
-  try {
-    const result = await StudentServices.getAllStudentsFromDB();
+  res.status(200).json({
+    success: true,
+    message: "Student is retrieved successfully!",
+    data: result,
+  });
+});
 
-    res.status(200).json({
-      success: true,
-      message: "Students are retrieved successfully",
-      data: result,
-    });
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: err instanceof Error ? err.message : "something went wrong",
-      error: err,
-    });
-  }
-};
+const deleteStudent = catchAsync(async (req, res) => {
+  const { studentId } = req.params;
 
-const getSingleStudent = async (req: Request, res: Response) => {
-  try {
-    const { studentId } = req.params;
+  const result = await StudentServices.deleteStudentsFromDB(studentId);
 
-    const result = await StudentServices.getSingleStudentsFromDB(studentId);
-
-    res.status(200).json({
-      success: true,
-      message: "Student is retrieved successfully!",
-      data: result,
-    });
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: err instanceof Error ? err.message : "something went wrong",
-      error: err,
-    });
-  }
-};
-
-const deleteStudent = async (req: Request, res: Response) => {
-  try {
-    const { studentId } = req.params;
-
-    const result = await StudentServices.deleteStudentsFromDB(studentId);
-
-    res.status(200).json({
-      success: true,
-      message: "Student is deleted successfully!",
-      data: result,
-    });
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: err instanceof Error ? err.message : "something went wrong",
-      error: err,
-    });
-  }
-};
+  res.status(200).json({
+    success: true,
+    message: "Student is deleted successfully!",
+    data: result,
+  });
+});
 
 export const StudentController = {
-  createStudent,
   getAllStudents,
   getSingleStudent,
   deleteStudent,
