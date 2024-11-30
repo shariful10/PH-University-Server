@@ -78,7 +78,7 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       },
       required: true,
     },
-    dateOfBirth: { type: String },
+    dateOfBirth: { type: Date },
     contactNo: { type: String, required: true },
     emergencyContactNo: { type: String, required: true },
     presentAddress: { type: String, required: true },

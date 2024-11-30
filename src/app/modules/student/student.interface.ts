@@ -30,7 +30,7 @@ export type TStudent = {
   email: string;
   gender: "male" | "female" | "other";
   profileImg?: string;
-  dateOfBirth?: string;
+  dateOfBirth?: Date;
   contactNo: string;
   emergencyContactNo: string;
   presentAddress: string;

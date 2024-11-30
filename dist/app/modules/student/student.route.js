@@ -5,10 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StudentRoutes = void 0;
 const express_1 = __importDefault(require("express"));
-const student_controller_1 = require("./student.controller");
+const student_controllers_1 = require("./student.controllers");
 const router = express_1.default.Router();
-router.post("/create-student", student_controller_1.StudentController.createStudent);
-router.get("/", student_controller_1.StudentController.getAllStudents);
-router.get("/:studentId", student_controller_1.StudentController.getSingleStudent);
-router.delete("/:studentId", student_controller_1.StudentController.deleteStudent);
+router.get("/", student_controllers_1.StudentControllers.getAllStudents);
+router.get("/:studentId", student_controllers_1.StudentControllers.getSingleStudent);
+router.delete("/:studentId", student_controllers_1.StudentControllers.deleteStudent);
 exports.StudentRoutes = router;

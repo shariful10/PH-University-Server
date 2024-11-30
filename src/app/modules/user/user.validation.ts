@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const userValidationSchema = z.object({
+const createUserValidationSchema = z.object({
   password: z
     .string({
       invalid_type_error: "Password must be a string",
@@ -8,3 +8,7 @@ export const userValidationSchema = z.object({
     .max(20, "Password can not be more than 20 characters")
     .optional(),
 });
+
+export const UserValidations = {
+  createUserValidationSchema,
+};

@@ -13,10 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Student = void 0;
-const bcrypt_1 = __importDefault(require("bcrypt"));
 const mongoose_1 = require("mongoose");
 const validator_1 = __importDefault(require("validator"));
-const config_1 = __importDefault(require("../../config"));
 const UserNameSchema = new mongoose_1.Schema({
     firstName: {
         type: String,
@@ -57,8 +55,13 @@ const GuardianSchema = new mongoose_1.Schema({
 });
 const studentSchema = new mongoose_1.Schema({
     id: { type: String, required: true, unique: true },
+    user: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        required: true,
+        unique: true,
+        ref: "User",
+    },
     name: { type: UserNameSchema, required: true },
-    password: { type: String, required: true },
     email: {
         type: String,
         required: true,
@@ -77,7 +80,7 @@ const studentSchema = new mongoose_1.Schema({
         },
         required: true,
     },
-    dateOfBirth: { type: String },
+    dateOfBirth: { type: Date },
     contactNo: { type: String, required: true },
     emergencyContactNo: { type: String, required: true },
     presentAddress: { type: String, required: true },
@@ -89,25 +92,11 @@ const studentSchema = new mongoose_1.Schema({
         enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
         required: true,
     },
-    isActive: { type: String, enum: ["active", "blocked"], default: "active" },
     isDeleted: { type: Boolean, default: false },
 }, { toJSON: { virtuals: true } });
 // Virtuals
 studentSchema.virtual("fullName").get(function () {
     return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`;
-});
-// Pre save middleware/hook : will work on create() and save()
-studentSchema.pre("save", function (next) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // Hashing password and save into DB
-        this.password = yield bcrypt_1.default.hash(this.password, Number(config_1.default.bcryptSaltRounds));
-        next();
-    });
-});
-// Post save middleware/hook : will work on create() and save()
-studentSchema.post("save", function (doc, next) {
-    doc.password = "";
-    next();
 });
 // Query middleware/hook
 studentSchema.pre("find", function (next) {
@@ -135,9 +124,4 @@ studentSchema.statics.isUserExists = function (id) {
         return existingUser;
     });
 };
-// Custom instance method
-// studentSchema.methods.isUserExists = async function (id: string) {
-//   const existingUser = await Student.findOne({ id });
-//   return existingUser;
-// };
 exports.Student = (0, mongoose_1.model)("Student", studentSchema);
