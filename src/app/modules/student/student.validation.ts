@@ -40,22 +40,22 @@ const createStudentValidationSchema = z.object({
       .string({ required_error: "Password is required" })
       .min(6, "Password must be at least 6 characters long")
       .max(20, "Password can not be more than 20 characters"),
-    name: UserNameValidationSchema,
-    email: z.string().email("Invalid email address"),
-    profileImg: z.string().optional(),
-    gender: z.enum(["male", "female", "other"], {
-      required_error: "Gender is required",
+    student: z.object({
+      name: UserNameValidationSchema,
+      email: z.string().email("Invalid email address"),
+      profileImg: z.string().optional(),
+      gender: z.enum(["male", "female", "other"]),
+      dateOfBirth: z.string().optional(),
+      contactNo: z.string().min(1, "Contact number is required"),
+      emergencyContactNo: z
+        .string()
+        .min(1, "Emergency contact number is required"),
+      presentAddress: z.string().min(1, "Present address is required"),
+      permanentAddress: z.string().min(1, "Permanent address is required"),
+      guardian: GuardianValidationSchema,
+      localGuardian: LocalGuardianValidationSchema,
+      bloodGroup: z.enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]),
     }),
-    dateOfBirth: z.date().optional(),
-    contactNo: z.string().min(1, "Contact number is required"),
-    emergencyContactNo: z
-      .string()
-      .min(1, "Emergency contact number is required"),
-    presentAddress: z.string().min(1, "Present address is required"),
-    permanentAddress: z.string().min(1, "Permanent address is required"),
-    guardian: GuardianValidationSchema,
-    localGuardian: LocalGuardianValidationSchema,
-    bloodGroup: z.enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]),
   }),
 });
 
