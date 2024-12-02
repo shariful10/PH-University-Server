@@ -31,16 +31,16 @@ const getAllAcademicSemesters = (0, catchAsync_1.default)((req, res) => __awaite
     });
 }));
 const getSingleAcademicSemester = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { academicSemesterId } = req.params;
-    const result = yield academicSemester_service_1.AcademicSemesterServices.getSingleAcademicSemesterFromDB(academicSemesterId);
+    const { semesterId } = req.params;
+    const result = yield academicSemester_service_1.AcademicSemesterServices.getSingleAcademicSemesterFromDB(semesterId);
     (0, sendResponse_1.default)(res, {
         message: "Academic Semester retrieved successfully!",
         data: result,
     });
 }));
 const updateAcademicSemester = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { academicSemesterId } = req.params;
-    const result = yield academicSemester_service_1.AcademicSemesterServices.updateAcademicSemesterFromDB(academicSemesterId, req.body);
+    const { semesterId } = req.params;
+    const result = yield academicSemester_service_1.AcademicSemesterServices.updateAcademicSemesterFromDB(semesterId, req.body);
     (0, sendResponse_1.default)(res, {
         message: "Academic Semester updated successfully!",
         data: result,

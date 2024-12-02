@@ -90,6 +90,11 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
       required: true,
     },
+    admissionSemester: {
+      type: Schema.Types.ObjectId,
+      ref: "AcademicSemester",
+      required: true,
+    },
     isDeleted: { type: Boolean, default: false },
   },
   { toJSON: { virtuals: true } },

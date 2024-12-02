@@ -5,7 +5,7 @@ import { TUser } from "./user.interface";
 
 const userSchema = new Schema<TUser>(
   {
-    id: { type: String, required: true },
+    id: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     needsChangePassword: { type: Boolean, default: true },
     role: {

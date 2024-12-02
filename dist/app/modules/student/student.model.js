@@ -92,6 +92,11 @@ const studentSchema = new mongoose_1.Schema({
         enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
         required: true,
     },
+    admissionSemester: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "AcademicSemester",
+        required: true,
+    },
     isDeleted: { type: Boolean, default: false },
 }, { toJSON: { virtuals: true } });
 // Virtuals

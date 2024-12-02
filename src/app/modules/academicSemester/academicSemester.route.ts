@@ -16,12 +16,15 @@ router.post(
 router.get("/", AcademicSemesterControllers.getAllAcademicSemesters);
 
 router.get(
-  "/:academicSemesterId",
+  "/:semesterId",
   AcademicSemesterControllers.getSingleAcademicSemester,
 );
 
 router.patch(
-  "/:academicSemesterId",
+  "/:semesterId",
+  validateRequest(
+    AcademicSemesterValidation.updateAcademicSemesterValidationSchema,
+  ),
   AcademicSemesterControllers.updateAcademicSemester,
 );
 
