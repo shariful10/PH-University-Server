@@ -23,6 +23,10 @@ const moduleRoutes = [
         path: "/academic-faculties",
         route: academicFaculty_route_1.AcademicFacultyRoutes,
     },
+    {
+        path: "/academic-departments",
+        route: academicFaculty_route_1.AcademicFacultyRoutes,
+    },
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));
 exports.default = router;
