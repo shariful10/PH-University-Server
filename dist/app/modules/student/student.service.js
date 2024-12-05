@@ -12,12 +12,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.StudentServices = void 0;
 const student_model_1 = require("./student.model");
 const getAllStudentsFromDB = () => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield student_model_1.Student.find();
+    const result = yield student_model_1.Student.find()
+        .populate("admissionSemester")
+        .populate({
+        path: "academicDepartment",
+        populate: {
+            path: "academicFaculty",
+        },
+    });
     return result;
 });
 const getSingleStudentsFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    // const result = await Student.findOne({ id });
-    const result = yield student_model_1.Student.aggregate([{ $match: { id } }]);
+    const result = yield student_model_1.Student.findById(id)
+        .populate("admissionSemester")
+        .populate({
+        path: "academicDepartment",
+        populate: {
+            path: "academicFaculty",
+        },
+    });
     return result;
 });
 const deleteStudentsFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {

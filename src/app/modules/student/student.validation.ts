@@ -56,6 +56,7 @@ const createStudentValidationSchema = z.object({
       localGuardian: LocalGuardianValidationSchema,
       bloodGroup: z.enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]),
       admissionSemester: z.string(),
+      academicDepartment: z.string(),
     }),
   }),
 });
