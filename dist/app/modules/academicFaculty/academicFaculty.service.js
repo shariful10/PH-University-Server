@@ -8,8 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AcademicFacultyServices = void 0;
+const AppError_1 = __importDefault(require("../../errors/AppError"));
 const academicFaculty_model_1 = require("./academicFaculty.model");
 const createAcademicFacultyIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield academicFaculty_model_1.AcademicFaculty.create(payload);
@@ -21,6 +25,9 @@ const getAllAcademicFacultiesFromDB = () => __awaiter(void 0, void 0, void 0, fu
 });
 const getSingleAcademicFacultyFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield academicFaculty_model_1.AcademicFaculty.findById(id);
+    if (!result) {
+        throw new AppError_1.default(404, "Academic faculty not found!");
+    }
     return result;
 });
 const updateAcademicFacultyIntoDB = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
@@ -28,7 +35,7 @@ const updateAcademicFacultyIntoDB = (id, payload) => __awaiter(void 0, void 0, v
         new: true,
     });
     if (!result) {
-        throw new Error("Academic faculty not found!");
+        throw new AppError_1.default(404, "Academic faculty not found!");
     }
     return result;
 });

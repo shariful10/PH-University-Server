@@ -29,7 +29,7 @@ const getSingleAcademicSemester = catchAsync(async (req, res) => {
     await AcademicSemesterServices.getSingleAcademicSemesterFromDB(semesterId);
 
   sendResponse(res, {
-    message: "Academic Semester retrieved successfully!",
+    message: "Academic Semester is retrieved successfully!",
     data: result,
   });
 });

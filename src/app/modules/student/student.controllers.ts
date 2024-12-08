@@ -19,7 +19,7 @@ const getSingleStudent: RequestHandler = async (req, res, next) => {
   try {
     const { studentId } = req.params;
 
-    const result = await StudentServices.getSingleStudentsFromDB(studentId);
+    const result = await StudentServices.getSingleStudentFromDB(studentId);
 
     sendResponse(res, {
       message: "Student is retrieved successfully!",
@@ -34,7 +34,7 @@ const deleteStudent: RequestHandler = async (req, res, next) => {
   try {
     const { studentId } = req.params;
 
-    const result = await StudentServices.deleteStudentsFromDB(studentId);
+    const result = await StudentServices.deleteStudentFromDB(studentId);
 
     sendResponse(res, {
       message: "Student is deleted successfully!",

@@ -8,14 +8,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AcademicSemesterServices = void 0;
+const AppError_1 = __importDefault(require("../../errors/AppError"));
 const academicSemester_const_1 = require("./academicSemester.const");
 const academicSemester_model_1 = require("./academicSemester.model");
 const createAcademicSemesterIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     if (payload.name &&
         academicSemester_const_1.academicSemesterNameCodeMapper[payload.name] !== payload.code) {
-        throw new Error("Invalid Semester code!");
+        throw new AppError_1.default(400, "Invalid Semester code!");
     }
     const result = academicSemester_model_1.AcademicSemester.create(payload);
     return result;
@@ -27,7 +31,7 @@ const getAllAcademicSemestersFromDB = () => __awaiter(void 0, void 0, void 0, fu
 const getSingleAcademicSemesterFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = academicSemester_model_1.AcademicSemester.findById(id);
     if (!result) {
-        throw new Error("Academic semester not found!");
+        throw new AppError_1.default(404, "Academic semester not found!");
     }
     return result;
 });
@@ -35,13 +39,13 @@ const updateAcademicSemesterFromDB = (id, payload) => __awaiter(void 0, void 0, 
     if (payload.name &&
         payload.code &&
         academicSemester_const_1.academicSemesterNameCodeMapper[payload.name] !== payload.code) {
-        throw new Error("Invalid Semester code!");
+        throw new AppError_1.default(404, "Invalid Semester code!");
     }
     const result = yield academicSemester_model_1.AcademicSemester.findByIdAndUpdate(id, payload, {
         new: true,
     });
     if (!result) {
-        throw new Error("Academic semester not found!");
+        throw new AppError_1.default(404, "Academic semester not found!");
     }
     return result;
 });

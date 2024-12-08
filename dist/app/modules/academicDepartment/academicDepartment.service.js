@@ -8,8 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AcademicDepartmentServices = void 0;
+const AppError_1 = __importDefault(require("../../errors/AppError"));
 const academicDepartment_model_1 = require("./academicDepartment.model");
 const createAcademicDepartmentIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield academicDepartment_model_1.AcademicDepartment.create(payload);
@@ -22,7 +26,7 @@ const getAllAcademicFDepartmentsFromDB = () => __awaiter(void 0, void 0, void 0,
 const getSingleAcademicDepartmentFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield academicDepartment_model_1.AcademicDepartment.findById(id).populate("academicFaculty");
     if (!result) {
-        throw new Error("Academic Department not found!");
+        throw new AppError_1.default(400, "Academic Department not found!");
     }
     return result;
 });

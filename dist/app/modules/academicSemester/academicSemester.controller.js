@@ -34,7 +34,7 @@ const getSingleAcademicSemester = (0, catchAsync_1.default)((req, res) => __awai
     const { semesterId } = req.params;
     const result = yield academicSemester_service_1.AcademicSemesterServices.getSingleAcademicSemesterFromDB(semesterId);
     (0, sendResponse_1.default)(res, {
-        message: "Academic Semester retrieved successfully!",
+        message: "Academic Semester is retrieved successfully!",
         data: result,
     });
 }));

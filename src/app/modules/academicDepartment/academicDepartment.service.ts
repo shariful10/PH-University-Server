@@ -1,3 +1,4 @@
+import AppError from "../../errors/AppError";
 import { TAcademicDepartment } from "./academicDepartment.interface";
 import { AcademicDepartment } from "./academicDepartment.model";
 
@@ -16,7 +17,7 @@ const getSingleAcademicDepartmentFromDB = async (id: string) => {
     await AcademicDepartment.findById(id).populate("academicFaculty");
 
   if (!result) {
-    throw new Error("Academic Department not found!");
+    throw new AppError(400, "Academic Department not found!");
   }
 
   return result;

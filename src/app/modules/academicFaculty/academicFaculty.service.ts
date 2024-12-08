@@ -1,3 +1,4 @@
+import AppError from "../../errors/AppError";
 import { TAcademicFaculty } from "./academicFaculty.interface";
 import { AcademicFaculty } from "./academicFaculty.model";
 
@@ -13,6 +14,11 @@ const getAllAcademicFacultiesFromDB = async () => {
 
 const getSingleAcademicFacultyFromDB = async (id: string) => {
   const result = await AcademicFaculty.findById(id);
+
+  if (!result) {
+    throw new AppError(404, "Academic faculty not found!");
+  }
+
   return result;
 };
 
@@ -24,7 +30,7 @@ const updateAcademicFacultyIntoDB = async (
     new: true,
   });
   if (!result) {
-    throw new Error("Academic faculty not found!");
+    throw new AppError(404, "Academic faculty not found!");
   }
   return result;
 };

@@ -30,7 +30,7 @@ const getAllStudents = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
 const getSingleStudent = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { studentId } = req.params;
-        const result = yield student_service_1.StudentServices.getSingleStudentsFromDB(studentId);
+        const result = yield student_service_1.StudentServices.getSingleStudentFromDB(studentId);
         (0, sendResponse_1.default)(res, {
             message: "Student is retrieved successfully!",
             data: result,
@@ -43,7 +43,7 @@ const getSingleStudent = (req, res, next) => __awaiter(void 0, void 0, void 0, f
 const deleteStudent = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { studentId } = req.params;
-        const result = yield student_service_1.StudentServices.deleteStudentsFromDB(studentId);
+        const result = yield student_service_1.StudentServices.deleteStudentFromDB(studentId);
         (0, sendResponse_1.default)(res, {
             message: "Student is deleted successfully!",
             data: result,

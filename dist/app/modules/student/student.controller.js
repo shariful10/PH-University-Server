@@ -12,36 +12,43 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.StudentController = void 0;
+exports.StudentControllers = exports.updateStudent = void 0;
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
+const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
 const student_service_1 = require("./student.service");
 const getAllStudents = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield student_service_1.StudentServices.getAllStudentsFromDB();
-    res.status(200).json({
-        success: true,
-        message: "Students are retrieved successfully",
+    (0, sendResponse_1.default)(res, {
+        message: "Student are retrieved successfully",
         data: result,
     });
 }));
 const getSingleStudent = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { studentId } = req.params;
-    const result = yield student_service_1.StudentServices.getSingleStudentsFromDB(studentId);
-    res.status(200).json({
-        success: true,
-        message: "Student is retrieved successfully!",
+    const result = yield student_service_1.StudentServices.getSingleStudentFromDB(studentId);
+    (0, sendResponse_1.default)(res, {
+        message: "Student is retrieved successfully",
+        data: result,
+    });
+}));
+exports.updateStudent = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { studentId } = req.params;
+    const { student } = req.body;
+    const result = yield student_service_1.StudentServices.updateStudentIntoDB(studentId, student);
+    (0, sendResponse_1.default)(res, {
+        message: "Student is updated successfully",
         data: result,
     });
 }));
 const deleteStudent = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { studentId } = req.params;
-    const result = yield student_service_1.StudentServices.deleteStudentsFromDB(studentId);
-    res.status(200).json({
-        success: true,
-        message: "Student is deleted successfully!",
+    const result = yield student_service_1.StudentServices.deleteStudentFromDB(studentId);
+    (0, sendResponse_1.default)(res, {
+        message: "Student is deleted successfully",
         data: result,
     });
 }));
-exports.StudentController = {
+exports.StudentControllers = {
     getAllStudents,
     getSingleStudent,
     deleteStudent,
