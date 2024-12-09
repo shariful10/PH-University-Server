@@ -4,6 +4,7 @@ import { User } from "../user/user.model";
 import { TStudent } from "./student.interface";
 import { Student } from "./student.model";
 
+// Get all students
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
   let searchTerm = "";
 
