@@ -28,16 +28,23 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const AppError_1 = __importDefault(require("../../errors/AppError"));
 const user_model_1 = require("../user/user.model");
 const student_model_1 = require("./student.model");
+// Get all students
 const getAllStudentsFromDB = (query) => __awaiter(void 0, void 0, void 0, function* () {
+    const queryObj = Object.assign({}, query);
     let searchTerm = "";
     if (query === null || query === void 0 ? void 0 : query.searchTerm) {
         searchTerm = query === null || query === void 0 ? void 0 : query.searchTerm;
     }
-    const result = yield student_model_1.Student.find({
+    const searchQuery = student_model_1.Student.find({
         $or: ["email", "name.firstName", "name.middleName", "presentAddress"].map(field => ({
             [field]: { $regex: searchTerm, $options: "i" },
         })),
-    })
+    });
+    // Filtering
+    const excludeFields = ["searchTerm", "sort", "limit", "page", "fields"];
+    excludeFields.forEach(el => delete queryObj[el]);
+    const filterQuery = searchQuery
+        .find(queryObj)
         .populate("admissionSemester")
         .populate({
         path: "academicDepartment",
@@ -45,7 +52,30 @@ const getAllStudentsFromDB = (query) => __awaiter(void 0, void 0, void 0, functi
             path: "academicFaculty",
         },
     });
-    return result;
+    let sort = "-createdAt";
+    if (query.sort) {
+        sort = query.sort;
+    }
+    const sortQuery = filterQuery.sort(sort);
+    let page = 1;
+    let limit = 0;
+    let skip = 0;
+    if (query.limit) {
+        limit = Number(query.limit);
+    }
+    if (query.page) {
+        page = Number(query.page);
+        skip = (page - 1) * limit;
+    }
+    const paginateQuery = sortQuery.skip(skip);
+    const limitQuery = paginateQuery.limit(limit);
+    //Field limiting
+    let fields = "-__v";
+    if (query.fields) {
+        fields = query.fields.split(",").join(" ");
+    }
+    const fieldsQuery = yield limitQuery.select(fields);
+    return fieldsQuery;
 });
 const getSingleStudentFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield student_model_1.Student.findOne({ id })
