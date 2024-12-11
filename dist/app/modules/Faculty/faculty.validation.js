@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.studentValidations = exports.updateFacultyValidationSchema = exports.createFacultyValidationSchema = void 0;
+exports.facultyValidations = exports.updateFacultyValidationSchema = exports.createFacultyValidationSchema = void 0;
 const zod_1 = require("zod");
 const faculty_constant_1 = require("./faculty.constant");
 const createUserNameValidationSchema = zod_1.z.object({
@@ -56,7 +56,7 @@ exports.updateFacultyValidationSchema = zod_1.z.object({
         }),
     }),
 });
-exports.studentValidations = {
+exports.facultyValidations = {
     createFacultyValidationSchema: exports.createFacultyValidationSchema,
     updateFacultyValidationSchema: exports.updateFacultyValidationSchema,
 };

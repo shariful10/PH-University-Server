@@ -20,10 +20,28 @@ const createUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
     const { password, student: studentData } = req.body;
     const result = yield user_service_1.UserServices.createStudentIntoDB(password, studentData);
     (0, sendResponse_1.default)(res, {
-        message: "Student created successfully",
+        message: "Student is created successfully",
+        data: result,
+    });
+}));
+const createFaculty = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { password, faculty: facultyData } = req.body;
+    const result = yield user_service_1.UserServices.createFacultyIntoDB(password, facultyData);
+    (0, sendResponse_1.default)(res, {
+        message: "Faculty is created successfully",
+        data: result,
+    });
+}));
+const createAdmin = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { password, admin: adminData } = req.body;
+    const result = yield user_service_1.UserServices.createAdminIntoDB(password, adminData);
+    (0, sendResponse_1.default)(res, {
+        message: "Admin is created successfully",
         data: result,
     });
 }));
 exports.UserControllers = {
     createUser,
+    createFaculty,
+    createAdmin,
 };
