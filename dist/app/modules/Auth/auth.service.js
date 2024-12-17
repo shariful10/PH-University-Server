@@ -16,20 +16,24 @@ exports.AuthServices = void 0;
 const AppError_1 = __importDefault(require("../../errors/AppError"));
 const user_model_1 = require("../user/user.model");
 const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield user_model_1.User.isUserExistsByCustomId(payload === null || payload === void 0 ? void 0 : payload.id);
     // Checking if the user is exist
-    const isUserExist = yield user_model_1.User.findOne({ id: payload === null || payload === void 0 ? void 0 : payload.id });
-    if (!isUserExist) {
+    if (!user) {
         throw new AppError_1.default(404, "User not found!");
     }
     // Checking if the user already deleted
-    const isDeleted = isUserExist === null || isUserExist === void 0 ? void 0 : isUserExist.isDeleted;
+    const isDeleted = user === null || user === void 0 ? void 0 : user.isDeleted;
     if (isDeleted) {
         throw new AppError_1.default(403, "This user is already deleted!");
     }
     // Checking if the user is blocked
-    const userStatus = isUserExist === null || isUserExist === void 0 ? void 0 : isUserExist.status;
+    const userStatus = user === null || user === void 0 ? void 0 : user.status;
     if (userStatus === "blocked") {
         throw new AppError_1.default(403, "This user is blocked!");
+    }
+    // Checking if the password is correct
+    if (!(yield user_model_1.User.isPasswordMatched(payload === null || payload === void 0 ? void 0 : payload.password, user.password))) {
+        throw new AppError_1.default(403, "Password is incorrect!");
     }
     // Access granted: Send Access token & Refresh token
     return {};
