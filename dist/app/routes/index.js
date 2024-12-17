@@ -7,6 +7,7 @@ const academicSemester_route_1 = require("../modules/academicSemester/academicSe
 const admin_route_1 = require("../modules/Admin/admin.route");
 const course_route_1 = require("../modules/Course/course.route");
 const faculty_route_1 = require("../modules/Faculty/faculty.route");
+const OfferedCourse_route_1 = require("../modules/OfferedCourse/OfferedCourse.route");
 const semesterRegistration_route_1 = require("../modules/semesterRegistration/semesterRegistration.route");
 const student_route_1 = require("../modules/student/student.route");
 const user_route_1 = require("../modules/user/user.route");
@@ -48,10 +49,10 @@ const moduleRoutes = [
         path: "/semester-registrations",
         route: semesterRegistration_route_1.semesterRegistrationRoutes,
     },
-    // {
-    //   path: '/offered-courses',
-    //   route: offeredCourseRoutes,
-    // },
+    {
+        path: "/offered-courses",
+        route: OfferedCourse_route_1.offeredCourseRoutes,
+    },
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));
 exports.default = router;
