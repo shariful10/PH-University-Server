@@ -75,7 +75,7 @@ const createOfferedCourseIntoDB = (payload) => __awaiter(void 0, void 0, void 0,
         endTime,
     };
     if ((0, OfferedCourse_utils_1.hasTimeConflict)(assignedSchedules, newSchedule)) {
-        throw new AppError_1.default(409, `This faculty is not available at that time ! Choose other time or day`);
+        throw new AppError_1.default(409, `This faculty is not available at that time! Choose other time or day`);
     }
     const result = yield OfferedCourse_model_1.OfferedCourse.create(Object.assign(Object.assign({}, payload), { academicSemester }));
     return result;
@@ -140,7 +140,7 @@ const deleteOfferedCourseFromDB = (id) => __awaiter(void 0, void 0, void 0, func
     const semesterRegistration = isOfferedCourseExists.semesterRegistration;
     const semesterRegistrationStatus = yield semesterRegistration_model_1.SemesterRegistration.findById(semesterRegistration).select("status");
     if ((semesterRegistrationStatus === null || semesterRegistrationStatus === void 0 ? void 0 : semesterRegistrationStatus.status) !== "UPCOMING") {
-        throw new AppError_1.default(400, `Offered course can not update ! because the semester ${semesterRegistrationStatus}`);
+        throw new AppError_1.default(400, `Offered course can not update! because the semester ${semesterRegistrationStatus}`);
     }
     const result = yield OfferedCourse_model_1.OfferedCourse.findByIdAndDelete(id);
     return result;

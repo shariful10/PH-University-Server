@@ -103,7 +103,7 @@ const createOfferedCourseIntoDB = async (payload: TOfferedCourse) => {
   if (hasTimeConflict(assignedSchedules, newSchedule)) {
     throw new AppError(
       409,
-      `This faculty is not available at that time ! Choose other time or day`,
+      `This faculty is not available at that time! Choose other time or day`,
     );
   }
 
@@ -208,7 +208,7 @@ const deleteOfferedCourseFromDB = async (id: string) => {
   if (semesterRegistrationStatus?.status !== "UPCOMING") {
     throw new AppError(
       400,
-      `Offered course can not update ! because the semester ${semesterRegistrationStatus}`,
+      `Offered course can not update! because the semester ${semesterRegistrationStatus}`,
     );
   }
 
