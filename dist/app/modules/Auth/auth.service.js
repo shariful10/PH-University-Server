@@ -13,6 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthServices = void 0;
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const config_1 = __importDefault(require("../../config"));
 const AppError_1 = __importDefault(require("../../errors/AppError"));
 const user_model_1 = require("../user/user.model");
 const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
@@ -33,10 +35,18 @@ const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     }
     // Checking if the password is correct
     if (!(yield user_model_1.User.isPasswordMatched(payload === null || payload === void 0 ? void 0 : payload.password, user.password))) {
+        // Access granted: Send Access token & Refresh token
         throw new AppError_1.default(403, "Password is incorrect!");
     }
-    // Access granted: Send Access token & Refresh token
-    return {};
+    // Create token and send it to the client
+    const jwtPayload = {
+        userId: user.id,
+        role: user.role,
+    };
+    const accessToken = jsonwebtoken_1.default.sign(jwtPayload, config_1.default.jwtAccessSecret, {
+        expiresIn: "10d",
+    });
+    return { accessToken, needsChangePassword: user === null || user === void 0 ? void 0 : user.needsChangePassword };
 });
 exports.AuthServices = {
     loginUser,
