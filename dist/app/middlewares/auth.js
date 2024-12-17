@@ -12,13 +12,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const config_1 = __importDefault(require("../config"));
+const AppError_1 = __importDefault(require("../errors/AppError"));
 const catchAsync_1 = __importDefault(require("../utils/catchAsync"));
-const validateRequest = (schema) => {
-    return (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-        yield schema.parseAsync({
-            body: req.body,
+const auth = () => {
+    return (0, catchAsync_1.default)((req, _res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        const token = req.headers.authorization;
+        // If the token send from the client
+        if (!token) {
+            throw new AppError_1.default(401, "You are not authorized");
+        }
+        // Check if the token is valid
+        jsonwebtoken_1.default.verify(token, config_1.default.jwtAccessSecret, function (err, decoded) {
+            if (err) {
+                throw new AppError_1.default(401, "You are not authorized");
+            }
+            req.user = decoded;
+            next();
         });
-        next();
     }));
 };
-exports.default = validateRequest;
+exports.default = auth;
