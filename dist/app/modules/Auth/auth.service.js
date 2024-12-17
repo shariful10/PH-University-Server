@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthServices = void 0;
+const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = __importDefault(require("../../config"));
 const AppError_1 = __importDefault(require("../../errors/AppError"));
@@ -48,6 +49,38 @@ const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     });
     return { accessToken, needsChangePassword: user === null || user === void 0 ? void 0 : user.needsChangePassword };
 });
+const changePassword = (userData, payload) => __awaiter(void 0, void 0, void 0, function* () {
+    // checking if the user is exist
+    const user = yield user_model_1.User.isUserExistsByCustomId(userData.userId);
+    if (!user) {
+        throw new AppError_1.default(404, "This user is not found !");
+    }
+    // checking if the user is already deleted
+    const isDeleted = user === null || user === void 0 ? void 0 : user.isDeleted;
+    if (isDeleted) {
+        throw new AppError_1.default(403, "This user is deleted !");
+    }
+    // checking if the user is blocked
+    const userStatus = user === null || user === void 0 ? void 0 : user.status;
+    if (userStatus === "blocked") {
+        throw new AppError_1.default(403, "This user is blocked ! !");
+    }
+    //checking if the password is correct
+    if (!(yield user_model_1.User.isPasswordMatched(payload.oldPassword, user === null || user === void 0 ? void 0 : user.password)))
+        throw new AppError_1.default(403, "Password do not matched");
+    //hash new password
+    const newHashedPassword = yield bcrypt_1.default.hash(payload.newPassword, Number(config_1.default.bcryptSaltRounds));
+    yield user_model_1.User.findOneAndUpdate({
+        id: userData.userId,
+        role: userData.role,
+    }, {
+        password: newHashedPassword,
+        needsChangePassword: false,
+        passwordChangedAt: new Date(),
+    });
+    return null;
+});
 exports.AuthServices = {
     loginUser,
+    changePassword,
 };

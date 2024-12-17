@@ -6,8 +6,9 @@ import { TUser, UserModel } from "./user.interface";
 const userSchema = new Schema<TUser, UserModel>(
   {
     id: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    password: { type: String, required: true, select: 0 },
     needsChangePassword: { type: Boolean, default: true },
+    passwordChangedAt: { type: Date },
     role: {
       type: String,
       enum: ["admin", "student", "faculty"],

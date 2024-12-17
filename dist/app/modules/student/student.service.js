@@ -33,6 +33,7 @@ const student_model_1 = require("./student.model");
 // Get all students
 const getAllStudentsFromDB = (query) => __awaiter(void 0, void 0, void 0, function* () {
     const studentQuery = new QueryBuilder_1.default(student_model_1.Student.find()
+        .populate("user")
         .populate("admissionSemester")
         .populate({
         path: "academicDepartment",
