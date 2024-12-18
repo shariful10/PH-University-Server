@@ -18,6 +18,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = __importDefault(require("../../config"));
 const AppError_1 = __importDefault(require("../../errors/AppError"));
 const user_model_1 = require("../user/user.model");
+const auth_utils_1 = require("./auth.utils");
 const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield user_model_1.User.isUserExistsByCustomId(payload === null || payload === void 0 ? void 0 : payload.id);
     // Checking if the user is exist
@@ -44,10 +45,13 @@ const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
         userId: user.id,
         role: user.role,
     };
-    const accessToken = jsonwebtoken_1.default.sign(jwtPayload, config_1.default.jwtAccessSecret, {
-        expiresIn: "10d",
-    });
-    return { accessToken, needsChangePassword: user === null || user === void 0 ? void 0 : user.needsChangePassword };
+    const accessToken = (0, auth_utils_1.createToken)(jwtPayload, config_1.default.jwtAccessSecret, config_1.default.jwtAccessExpiresIn);
+    const refreshToken = (0, auth_utils_1.createToken)(jwtPayload, config_1.default.jwtRefreshSecret, config_1.default.jwtRefreshExpiresIn);
+    return {
+        accessToken,
+        refreshToken,
+        needsChangePassword: user === null || user === void 0 ? void 0 : user.needsChangePassword,
+    };
 });
 const changePassword = (userData, payload) => __awaiter(void 0, void 0, void 0, function* () {
     // checking if the user is exist
@@ -80,7 +84,40 @@ const changePassword = (userData, payload) => __awaiter(void 0, void 0, void 0, 
     });
     return null;
 });
+const refreshToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
+    // Check if the token is valid
+    const decoded = jsonwebtoken_1.default.verify(token, config_1.default.jwtRefreshSecret);
+    const { userId, iat } = decoded;
+    const user = yield user_model_1.User.isUserExistsByCustomId(userId);
+    // Checking if the user is exist
+    if (!user) {
+        throw new AppError_1.default(404, "User not found!");
+    }
+    // Checking if the user already deleted
+    const isDeleted = user === null || user === void 0 ? void 0 : user.isDeleted;
+    if (isDeleted) {
+        throw new AppError_1.default(403, "This user is already deleted!");
+    }
+    // Checking if the user is blocked
+    const userStatus = user === null || user === void 0 ? void 0 : user.status;
+    if (userStatus === "blocked") {
+        throw new AppError_1.default(403, "This user is blocked!");
+    }
+    if (user.passwordChangedAt &&
+        user_model_1.User.isJWTIssuedBeforePasswordChanged(user.passwordChangedAt, iat)) {
+        throw new AppError_1.default(401, "You are not authorized");
+    }
+    const jwtPayload = {
+        userId: user.id,
+        role: user.role,
+    };
+    const accessToken = (0, auth_utils_1.createToken)(jwtPayload, config_1.default.jwtAccessSecret, config_1.default.jwtAccessExpiresIn);
+    return {
+        accessToken,
+    };
+});
 exports.AuthServices = {
     loginUser,
     changePassword,
+    refreshToken,
 };

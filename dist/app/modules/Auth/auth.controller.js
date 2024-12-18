@@ -24,22 +24,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthControllers = void 0;
+const config_1 = __importDefault(require("../../config"));
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
 const auth_service_1 = require("./auth.service");
 const loginUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield auth_service_1.AuthServices.loginUser(req.body);
-    // const { refreshToken, accessToken, needsPasswordChange } = result;
-    // res.cookie("refreshToken", refreshToken, {
-    //   secure: config.NODE_ENV === "production",
-    //   httpOnly: true,
-    // });
+    const { refreshToken, accessToken, needsChangePassword } = result;
+    res.cookie("refreshToken", refreshToken, {
+        secure: config_1.default.NODE_ENV === "production",
+        httpOnly: true,
+    });
     (0, sendResponse_1.default)(res, {
         message: "User is logged in successfully!",
         data: {
-            // accessToken,
-            // needsPasswordChange,
-            result,
+            accessToken,
+            needsChangePassword,
         },
     });
 }));
@@ -51,7 +51,16 @@ const changePassword = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
         data: null,
     });
 }));
+const refreshToken = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { refreshToken } = req.cookies;
+    const result = yield auth_service_1.AuthServices.refreshToken(refreshToken);
+    (0, sendResponse_1.default)(res, {
+        message: "Access token is retrieved successfully!",
+        data: result,
+    });
+}));
 exports.AuthControllers = {
     loginUser,
     changePassword,
+    refreshToken,
 };
