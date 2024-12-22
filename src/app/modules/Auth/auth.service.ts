@@ -1,37 +1,17 @@
 import bcrypt from "bcrypt";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import { JwtPayload } from "jsonwebtoken";
 import config from "../../config";
 import AppError from "../../errors/AppError";
 import { httpStatusCode } from "../../utils/httpStatusCode";
 import { sendEmail } from "../../utils/sendEmail";
+import { validateUser } from "../../utils/validateUser";
+import { verifyToken } from "../../utils/verifyToken";
 import { User } from "../user/user.model";
-import { TLoginUser } from "./auth.interface";
+import { TLoginUser, TResetPassword } from "./auth.interface";
 import { createToken } from "./auth.utils";
 
 const loginUser = async (payload: TLoginUser) => {
-  const user = await User.isUserExistsByCustomId(payload?.id);
-
-  // Checking if the user is exist
-  if (!user) {
-    throw new AppError(httpStatusCode.NOT_FOUND, "User not found!");
-  }
-
-  // Checking if the user already deleted
-  const isDeleted = user?.isDeleted;
-
-  if (isDeleted) {
-    throw new AppError(
-      httpStatusCode.FORBIDDEN,
-      "This user is already deleted!",
-    );
-  }
-
-  // Checking if the user is blocked
-  const userStatus = user?.status;
-
-  if (userStatus === "blocked") {
-    throw new AppError(httpStatusCode.FORBIDDEN, "This user is blocked!");
-  }
+  const user = await validateUser(payload?.id);
 
   // Checking if the password is correct
   if (!(await User.isPasswordMatched(payload?.password, user.password))) {
@@ -95,7 +75,7 @@ const changePassword = async (
   if (!(await User.isPasswordMatched(payload.oldPassword, user?.password)))
     throw new AppError(httpStatusCode.FORBIDDEN, "Password do not matched");
 
-  //hash new password
+  // Hash new password
   const newHashedPassword = await bcrypt.hash(
     payload.newPassword,
     Number(config.bcryptSaltRounds),
@@ -118,36 +98,11 @@ const changePassword = async (
 
 const refreshToken = async (token: string) => {
   // Check if the token is valid
-  const decoded = jwt.verify(
-    token,
-    config.jwtRefreshSecret as string,
-  ) as JwtPayload;
+  const decoded = verifyToken(token, config.jwtRefreshSecret as string);
 
   const { userId, iat } = decoded;
 
-  const user = await User.isUserExistsByCustomId(userId);
-
-  // Checking if the user is exist
-  if (!user) {
-    throw new AppError(httpStatusCode.NOT_FOUND, "User not found!");
-  }
-
-  // Checking if the user already deleted
-  const isDeleted = user?.isDeleted;
-
-  if (isDeleted) {
-    throw new AppError(
-      httpStatusCode.FORBIDDEN,
-      "This user is already deleted!",
-    );
-  }
-
-  // Checking if the user is blocked
-  const userStatus = user?.status;
-
-  if (userStatus === "blocked") {
-    throw new AppError(httpStatusCode.FORBIDDEN, "This user is blocked!");
-  }
+  const user = await validateUser(userId);
 
   if (
     user.passwordChangedAt &&
@@ -173,29 +128,7 @@ const refreshToken = async (token: string) => {
 };
 
 const forgetPassword = async (userId: string) => {
-  const user = await User.isUserExistsByCustomId(userId);
-
-  // Checking if the user is exist
-  if (!user) {
-    throw new AppError(httpStatusCode.NOT_FOUND, "User not found!");
-  }
-
-  // Checking if the user already deleted
-  const isDeleted = user?.isDeleted;
-
-  if (isDeleted) {
-    throw new AppError(
-      httpStatusCode.FORBIDDEN,
-      "This user is already deleted!",
-    );
-  }
-
-  // Checking if the user is blocked
-  const userStatus = user?.status;
-
-  if (userStatus === "blocked") {
-    throw new AppError(httpStatusCode.FORBIDDEN, "This user is blocked!");
-  }
+  const user = await validateUser(userId);
 
   const jwtPayload = {
     userId: user.id,
@@ -213,9 +146,39 @@ const forgetPassword = async (userId: string) => {
   sendEmail(user.email, resetUILink);
 };
 
+const resetPassword = async (payload: TResetPassword, token: string) => {
+  const user = await validateUser(payload.id);
+
+  // Check if the token is valid
+  const decoded = verifyToken(token, config.jwtAccessSecret as string);
+
+  if (user.id !== decoded.userId) {
+    throw new AppError(httpStatusCode.FORBIDDEN, "You are not forbidden!");
+  }
+
+  // Hash new password
+  const newHashedPassword = await bcrypt.hash(
+    payload.newPassword,
+    Number(config.bcryptSaltRounds),
+  );
+
+  await User.findOneAndUpdate(
+    {
+      id: decoded.userId,
+      role: decoded.role,
+    },
+    {
+      password: newHashedPassword,
+      needsChangePassword: false,
+      passwordChangedAt: new Date(),
+    },
+  );
+};
+
 export const AuthServices = {
   loginUser,
   refreshToken,
   changePassword,
   forgetPassword,
+  resetPassword,
 };
