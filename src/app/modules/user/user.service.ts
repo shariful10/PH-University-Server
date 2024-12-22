@@ -15,6 +15,7 @@ import {
   generateFacultyId,
   generateStudentId,
 } from "./user.utils";
+import { httpStatusCode } from "../../utils/httpStatusCode";
 
 const createStudentIntoDB = async (password: string, payload: TStudent) => {
   // Create a user object
@@ -23,8 +24,9 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
   // If password is not provided use the default password
   userData.password = password || (config.defaultPassword as string);
 
-  // Set user role
+  // Set Student role & email
   userData.role = "student";
+  userData.email = payload.email;
 
   // Find academic semester info
   const admissionSemester = await AcademicSemester.findById(
@@ -32,7 +34,10 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
   );
 
   if (!admissionSemester) {
-    throw new AppError(400, "Admission semester not found");
+    throw new AppError(
+      httpStatusCode.BAD_REQUEST,
+      "Admission semester not found",
+    );
   }
 
   const session = await mongoose.startSession();
@@ -46,7 +51,7 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     const newUser = await User.create([userData], { session });
 
     if (!newUser.length) {
-      throw new AppError(400, "Failed to create user!");
+      throw new AppError(httpStatusCode.BAD_REQUEST, "Failed to create user!");
     }
 
     // Create a student
@@ -58,7 +63,10 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
       const newStudent = await Student.create([payload], { session });
 
       if (!newStudent.length) {
-        throw new AppError(400, "Failed to create student!");
+        throw new AppError(
+          httpStatusCode.BAD_REQUEST,
+          "Failed to create student!",
+        );
       }
 
       await session.commitTransaction();
@@ -70,55 +78,62 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     await session.abortTransaction();
     await session.endSession();
     throw new AppError(
-      500,
+      httpStatusCode.INTERNAL_SERVER_ERROR,
       err instanceof Error ? err.message : "Something went wrong!",
     );
   }
 };
 
 const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
-  // create a user object
+  // Create a user object
   const userData: Partial<TUser> = {};
 
-  //if password is not given , use default password
+  // If password is not given , use default password
   userData.password = password || (config.defaultPassword as string);
 
-  //set student role
+  // Set faculty role & email
   userData.role = "faculty";
+  userData.email = payload.email;
 
-  // find academic department info
+  // Find academic department info
   const academicDepartment = await AcademicDepartment.findById(
     payload.academicDepartment,
   );
 
   if (!academicDepartment) {
-    throw new AppError(400, "Academic department not found");
+    throw new AppError(
+      httpStatusCode.BAD_REQUEST,
+      "Academic department not found",
+    );
   }
 
   const session = await mongoose.startSession();
 
   try {
     session.startTransaction();
-    //set  generated id
+    // Set generated id
     userData.id = await generateFacultyId();
 
-    // create a user (transaction-1)
+    // Create a user (transaction-1)
     const newUser = await User.create([userData], { session }); // array
 
     //create a faculty
     if (!newUser.length) {
-      throw new AppError(400, "Failed to create user");
+      throw new AppError(httpStatusCode.BAD_REQUEST, "Failed to create user");
     }
-    // set id , _id as user
+    // Set id , _id as user
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id; //reference _id
 
-    // create a faculty (transaction-2)
+    // Create a faculty (transaction-2)
 
     const newFaculty = await Faculty.create([payload], { session });
 
     if (!newFaculty.length) {
-      throw new AppError(400, "Failed to create faculty");
+      throw new AppError(
+        httpStatusCode.BAD_REQUEST,
+        "Failed to create faculty",
+      );
     }
 
     await session.commitTransaction();
@@ -129,21 +144,22 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
     await session.abortTransaction();
     await session.endSession();
     throw new AppError(
-      500,
+      httpStatusCode.INTERNAL_SERVER_ERROR,
       err instanceof Error ? err.message : "Something went wrong!",
     );
   }
 };
 
 const createAdminIntoDB = async (password: string, payload: TFaculty) => {
-  // create a user object
+  // Create a user object
   const userData: Partial<TUser> = {};
 
-  //if password is not given , use default password
+  // If password is not given , use default password
   userData.password = password || (config.defaultPassword as string);
 
-  //set student role
+  // Set admin role & email
   userData.role = "admin";
+  userData.email = payload.email;
 
   const session = await mongoose.startSession();
 
@@ -152,22 +168,22 @@ const createAdminIntoDB = async (password: string, payload: TFaculty) => {
     //set  generated id
     userData.id = await generateAdminId();
 
-    // create a user (transaction-1)
+    // Create a user (transaction-1)
     const newUser = await User.create([userData], { session });
 
-    //create a admin
+    // Create a admin
     if (!newUser.length) {
-      throw new AppError(400, "Failed to create admin");
+      throw new AppError(httpStatusCode.BAD_REQUEST, "Failed to create admin");
     }
-    // set id , _id as user
+    // Set id , _id as user
     payload.id = newUser[0].id;
-    payload.user = newUser[0]._id; //reference _id
+    payload.user = newUser[0]._id; // Reference _id
 
-    // create a admin (transaction-2)
+    // Create a admin (transaction-2)
     const newAdmin = await Admin.create([payload], { session });
 
     if (!newAdmin.length) {
-      throw new AppError(400, "Failed to create admin");
+      throw new AppError(httpStatusCode.BAD_REQUEST, "Failed to create admin");
     }
 
     await session.commitTransaction();
@@ -178,7 +194,7 @@ const createAdminIntoDB = async (password: string, payload: TFaculty) => {
     await session.abortTransaction();
     await session.endSession();
     throw new AppError(
-      500,
+      httpStatusCode.INTERNAL_SERVER_ERROR,
       err instanceof Error ? err.message : "Something went wrong!",
     );
   }

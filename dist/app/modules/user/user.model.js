@@ -18,6 +18,7 @@ const mongoose_1 = require("mongoose");
 const config_1 = __importDefault(require("../../config"));
 const userSchema = new mongoose_1.Schema({
     id: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
     password: { type: String, required: true, select: 0 },
     needsChangePassword: { type: Boolean, default: true },
     passwordChangedAt: { type: Date },
