@@ -16,7 +16,7 @@ const createUserNameValidationSchema = zod_1.z.object({
 });
 exports.createFacultyValidationSchema = zod_1.z.object({
     body: zod_1.z.object({
-        password: zod_1.z.string().max(20),
+        password: zod_1.z.string().max(20).optional(),
         faculty: zod_1.z.object({
             designation: zod_1.z.string(),
             name: createUserNameValidationSchema,
@@ -29,7 +29,6 @@ exports.createFacultyValidationSchema = zod_1.z.object({
             presentAddress: zod_1.z.string(),
             permanentAddress: zod_1.z.string(),
             academicDepartment: zod_1.z.string(),
-            profileImg: zod_1.z.string(),
         }),
     }),
 });

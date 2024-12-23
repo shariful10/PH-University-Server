@@ -17,6 +17,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const config_1 = __importDefault(require("../../config"));
 const AppError_1 = __importDefault(require("../../errors/AppError"));
 const httpStatusCode_1 = require("../../utils/httpStatusCode");
+const sendImageToCloudinary_1 = require("../../utils/sendImageToCloudinary");
 const academicDepartment_model_1 = require("../academicDepartment/academicDepartment.model");
 const academicSemester_model_1 = require("../academicSemester/academicSemester.model");
 const admin_model_1 = require("../Admin/admin.model");
@@ -24,7 +25,8 @@ const faculty_model_1 = require("../Faculty/faculty.model");
 const student_model_1 = require("../student/student.model");
 const user_model_1 = require("./user.model");
 const user_utils_1 = require("./user.utils");
-const createStudentIntoDB = (password, payload) => __awaiter(void 0, void 0, void 0, function* () {
+const createStudentIntoDB = (file, password, payload) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     // Create a user object
     const userData = {};
     // If password is not provided use the default password
@@ -42,6 +44,10 @@ const createStudentIntoDB = (password, payload) => __awaiter(void 0, void 0, voi
         session.startTransaction();
         // Set generated id
         userData.id = yield (0, user_utils_1.generateStudentId)(admissionSemester);
+        // Send image to Cloudinary
+        const imageName = `${userData === null || userData === void 0 ? void 0 : userData.id}${(_a = payload === null || payload === void 0 ? void 0 : payload.name) === null || _a === void 0 ? void 0 : _a.firstName}`;
+        const path = file === null || file === void 0 ? void 0 : file.path;
+        const { secure_url } = (yield (0, sendImageToCloudinary_1.sendImageToCloudinary)(imageName, path));
         // Create a user
         const newUser = yield user_model_1.User.create([userData], { session });
         if (!newUser.length) {
@@ -52,6 +58,7 @@ const createStudentIntoDB = (password, payload) => __awaiter(void 0, void 0, voi
             // Set id, _id as user
             payload.id = newUser[0].id;
             payload.user = newUser[0]._id;
+            payload.profileImg = secure_url;
             const newStudent = yield student_model_1.Student.create([payload], { session });
             if (!newStudent.length) {
                 throw new AppError_1.default(httpStatusCode_1.httpStatusCode.BAD_REQUEST, "Failed to create student!");

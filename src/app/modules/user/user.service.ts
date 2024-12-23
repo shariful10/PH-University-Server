@@ -1,7 +1,9 @@
 import mongoose from "mongoose";
 import config from "../../config";
 import AppError from "../../errors/AppError";
+import { TUploadedFile } from "../../interface/file";
 import { httpStatusCode } from "../../utils/httpStatusCode";
+import { sendImageToCloudinary } from "../../utils/sendImageToCloudinary";
 import { AcademicDepartment } from "../academicDepartment/academicDepartment.model";
 import { AcademicSemester } from "../academicSemester/academicSemester.model";
 import { Admin } from "../Admin/admin.model";
@@ -17,7 +19,11 @@ import {
   generateStudentId,
 } from "./user.utils";
 
-const createStudentIntoDB = async (password: string, payload: TStudent) => {
+const createStudentIntoDB = async (
+  file: TUploadedFile,
+  password: string,
+  payload: TStudent,
+) => {
   // Create a user object
   const userData: Partial<TUser> = {};
 
@@ -47,6 +53,14 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     // Set generated id
     userData.id = await generateStudentId(admissionSemester);
 
+    // Send image to Cloudinary
+    const imageName = `${userData?.id}${payload?.name?.firstName}`;
+    const path = file?.path;
+
+    const { secure_url } = (await sendImageToCloudinary(imageName, path)) as {
+      secure_url: string;
+    };
+
     // Create a user
     const newUser = await User.create([userData], { session });
 
@@ -59,6 +73,7 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
       // Set id, _id as user
       payload.id = newUser[0].id;
       payload.user = newUser[0]._id;
+      payload.profileImg = secure_url;
 
       const newStudent = await Student.create([payload], { session });
 

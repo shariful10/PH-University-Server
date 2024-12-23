@@ -83,11 +83,11 @@ const createStudentValidationSchema = zod_1.z.object({
         password: zod_1.z
             .string({ required_error: "Password is required" })
             .min(6, "Password must be at least 6 characters long")
-            .max(20, "Password can not be more than 20 characters"),
+            .max(20, "Password can not be more than 20 characters")
+            .optional(),
         student: zod_1.z.object({
             name: UserNameValidationSchema,
             email: zod_1.z.string().email("Invalid email address"),
-            profileImg: zod_1.z.string().optional(),
             gender: zod_1.z.enum(["male", "female", "other"]),
             dateOfBirth: zod_1.z.string().optional(),
             contactNo: zod_1.z.string().min(1, "Contact number is required"),
