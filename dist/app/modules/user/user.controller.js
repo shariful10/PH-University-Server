@@ -13,9 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserControllers = void 0;
-const AppError_1 = __importDefault(require("../../errors/AppError"));
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
-const httpStatusCode_1 = require("../../utils/httpStatusCode");
 const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
 const user_service_1 = require("./user.service");
 const createUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -42,14 +40,19 @@ const createAdmin = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, vo
         data: result,
     });
 }));
-const getMe = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const token = req.headers.authorization;
-    if (!token) {
-        throw new AppError_1.default(httpStatusCode_1.httpStatusCode.NOT_FOUND, "Token not found!");
-    }
-    const result = yield user_service_1.UserServices.getMeFromDB(token);
+const changeStatus = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const result = yield user_service_1.UserServices.changeStatusIntoDB(id, req.body);
     (0, sendResponse_1.default)(res, {
-        message: "User fetched successfully",
+        message: "User status changed successfully!",
+        data: result,
+    });
+}));
+const getMe = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userId, role } = req.user;
+    const result = yield user_service_1.UserServices.getMeFromDB(userId, role);
+    (0, sendResponse_1.default)(res, {
+        message: "User is retrieved successfully",
         data: result,
     });
 }));
@@ -57,5 +60,6 @@ exports.UserControllers = {
     createUser,
     createFaculty,
     createAdmin,
+    changeStatus,
     getMe,
 };

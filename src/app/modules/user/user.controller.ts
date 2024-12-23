@@ -1,6 +1,4 @@
-import AppError from "../../errors/AppError";
 import catchAsync from "../../utils/catchAsync";
-import { httpStatusCode } from "../../utils/httpStatusCode";
 import sendResponse from "../../utils/sendResponse";
 import { UserServices } from "./user.service";
 
@@ -37,17 +35,24 @@ const createAdmin = catchAsync(async (req, res) => {
   });
 });
 
-const getMe = catchAsync(async (req, res) => {
-  const token = req.headers.authorization;
+const changeStatus = catchAsync(async (req, res) => {
+  const { id } = req.params;
 
-  if (!token) {
-    throw new AppError(httpStatusCode.NOT_FOUND, "Token not found!");
-  }
-
-  const result = await UserServices.getMeFromDB(token);
+  const result = await UserServices.changeStatusIntoDB(id, req.body);
 
   sendResponse(res, {
-    message: "User fetched successfully",
+    message: "User status changed successfully!",
+    data: result,
+  });
+});
+
+const getMe = catchAsync(async (req, res) => {
+  const { userId, role } = req.user;
+
+  const result = await UserServices.getMeFromDB(userId, role);
+
+  sendResponse(res, {
+    message: "User is retrieved successfully",
     data: result,
   });
 });
@@ -56,5 +61,6 @@ export const UserControllers = {
   createUser,
   createFaculty,
   createAdmin,
+  changeStatus,
   getMe,
 };

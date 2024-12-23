@@ -16,6 +16,7 @@ exports.User = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const mongoose_1 = require("mongoose");
 const config_1 = __importDefault(require("../../config"));
+const user_const_1 = require("./user.const");
 const userSchema = new mongoose_1.Schema({
     id: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
@@ -29,7 +30,7 @@ const userSchema = new mongoose_1.Schema({
     },
     status: {
         type: String,
-        enum: ["in-progress", "blocked"],
+        enum: user_const_1.UserStatus,
         default: "in-progress",
     },
     isDeleted: { type: Boolean, default: false },
