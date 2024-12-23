@@ -19,7 +19,6 @@ const AppError_1 = __importDefault(require("../../errors/AppError"));
 const httpStatusCode_1 = require("../../utils/httpStatusCode");
 const sendEmail_1 = require("../../utils/sendEmail");
 const validateUser_1 = require("../../utils/validateUser");
-const verifyToken_1 = require("../../utils/verifyToken");
 const user_model_1 = require("../user/user.model");
 const auth_utils_1 = require("./auth.utils");
 const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
@@ -75,7 +74,7 @@ const changePassword = (userData, payload) => __awaiter(void 0, void 0, void 0, 
 });
 const refreshToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
     // Check if the token is valid
-    const decoded = (0, verifyToken_1.verifyToken)(token, config_1.default.jwtRefreshSecret);
+    const decoded = (0, auth_utils_1.verifyToken)(token, config_1.default.jwtRefreshSecret);
     const { userId, iat } = decoded;
     const user = yield (0, validateUser_1.validateUser)(userId);
     if (user.passwordChangedAt &&
@@ -104,7 +103,7 @@ const forgetPassword = (userId) => __awaiter(void 0, void 0, void 0, function* (
 const resetPassword = (payload, token) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield (0, validateUser_1.validateUser)(payload.id);
     // Check if the token is valid
-    const decoded = (0, verifyToken_1.verifyToken)(token, config_1.default.jwtAccessSecret);
+    const decoded = (0, auth_utils_1.verifyToken)(token, config_1.default.jwtAccessSecret);
     if (user.id !== decoded.userId) {
         throw new AppError_1.default(httpStatusCode_1.httpStatusCode.FORBIDDEN, "You are not forbidden!");
     }

@@ -1,9 +1,11 @@
 import mongoose from "mongoose";
 import config from "../../config";
 import AppError from "../../errors/AppError";
+import { httpStatusCode } from "../../utils/httpStatusCode";
 import { AcademicDepartment } from "../academicDepartment/academicDepartment.model";
 import { AcademicSemester } from "../academicSemester/academicSemester.model";
 import { Admin } from "../Admin/admin.model";
+import { verifyToken } from "../Auth/auth.utils";
 import { TFaculty } from "../Faculty/faculty.interface";
 import { Faculty } from "../Faculty/faculty.model";
 import { TStudent } from "../student/student.interface";
@@ -15,7 +17,6 @@ import {
   generateFacultyId,
   generateStudentId,
 } from "./user.utils";
-import { httpStatusCode } from "../../utils/httpStatusCode";
 
 const createStudentIntoDB = async (password: string, payload: TStudent) => {
   // Create a user object
@@ -200,8 +201,38 @@ const createAdminIntoDB = async (password: string, payload: TFaculty) => {
   }
 };
 
+const getMeFromDB = async (token: string) => {
+  const decoded = verifyToken(token, config.jwtAccessSecret as string);
+
+  const { userId, role } = decoded;
+
+  let result = null;
+
+  if (role === "student") {
+    result = await Student.findOne({ id: userId })
+      .populate("admissionSemester")
+      .populate({
+        path: "academicDepartment",
+        populate: {
+          path: "academicFaculty",
+        },
+      });
+  }
+
+  if (role === "faculty") {
+    result = await Faculty.findOne({ id: userId });
+  }
+
+  if (role === "admin") {
+    result = await Admin.findOne({ id: userId });
+  }
+
+  return result;
+};
+
 export const UserServices = {
   createStudentIntoDB,
   createFacultyIntoDB,
   createAdminIntoDB,
+  getMeFromDB,
 };

@@ -18,4 +18,5 @@ router.post("/create-faculty", (0, auth_1.default)(user_const_1.USER_ROLE.admin)
 router.post("/create-admin", 
 // auth(USER_ROLE.admin),
 (0, validateRequest_1.default)(admin_validation_1.AdminValidations.createAdminValidationSchema), user_controller_1.UserControllers.createAdmin);
+router.get("/me", (0, auth_1.default)(user_const_1.USER_ROLE.admin, user_const_1.USER_ROLE.faculty, user_const_1.USER_ROLE.student), user_controller_1.UserControllers.getMe);
 exports.UserRoutes = router;

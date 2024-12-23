@@ -1,4 +1,6 @@
+import AppError from "../../errors/AppError";
 import catchAsync from "../../utils/catchAsync";
+import { httpStatusCode } from "../../utils/httpStatusCode";
 import sendResponse from "../../utils/sendResponse";
 import { UserServices } from "./user.service";
 
@@ -35,8 +37,24 @@ const createAdmin = catchAsync(async (req, res) => {
   });
 });
 
+const getMe = catchAsync(async (req, res) => {
+  const token = req.headers.authorization;
+
+  if (!token) {
+    throw new AppError(httpStatusCode.NOT_FOUND, "Token not found!");
+  }
+
+  const result = await UserServices.getMeFromDB(token);
+
+  sendResponse(res, {
+    message: "User fetched successfully",
+    data: result,
+  });
+});
+
 export const UserControllers = {
   createUser,
   createFaculty,
   createAdmin,
+  getMe,
 };

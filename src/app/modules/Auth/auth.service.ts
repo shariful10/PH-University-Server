@@ -5,10 +5,9 @@ import AppError from "../../errors/AppError";
 import { httpStatusCode } from "../../utils/httpStatusCode";
 import { sendEmail } from "../../utils/sendEmail";
 import { validateUser } from "../../utils/validateUser";
-import { verifyToken } from "../../utils/verifyToken";
 import { User } from "../user/user.model";
 import { TLoginUser, TResetPassword } from "./auth.interface";
-import { createToken } from "./auth.utils";
+import { createToken, verifyToken } from "./auth.utils";
 
 const loginUser = async (payload: TLoginUser) => {
   const user = await validateUser(payload?.id);

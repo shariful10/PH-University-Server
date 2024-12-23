@@ -16,14 +16,15 @@ exports.UserServices = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const config_1 = __importDefault(require("../../config"));
 const AppError_1 = __importDefault(require("../../errors/AppError"));
+const httpStatusCode_1 = require("../../utils/httpStatusCode");
 const academicDepartment_model_1 = require("../academicDepartment/academicDepartment.model");
 const academicSemester_model_1 = require("../academicSemester/academicSemester.model");
 const admin_model_1 = require("../Admin/admin.model");
+const auth_utils_1 = require("../Auth/auth.utils");
 const faculty_model_1 = require("../Faculty/faculty.model");
 const student_model_1 = require("../student/student.model");
 const user_model_1 = require("./user.model");
 const user_utils_1 = require("./user.utils");
-const httpStatusCode_1 = require("../../utils/httpStatusCode");
 const createStudentIntoDB = (password, payload) => __awaiter(void 0, void 0, void 0, function* () {
     // Create a user object
     const userData = {};
@@ -146,8 +147,31 @@ const createAdminIntoDB = (password, payload) => __awaiter(void 0, void 0, void 
         throw new AppError_1.default(httpStatusCode_1.httpStatusCode.INTERNAL_SERVER_ERROR, err instanceof Error ? err.message : "Something went wrong!");
     }
 });
+const getMeFromDB = (token) => __awaiter(void 0, void 0, void 0, function* () {
+    const decoded = (0, auth_utils_1.verifyToken)(token, config_1.default.jwtAccessSecret);
+    const { userId, role } = decoded;
+    let result = null;
+    if (role === "student") {
+        result = yield student_model_1.Student.findOne({ id: userId })
+            .populate("admissionSemester")
+            .populate({
+            path: "academicDepartment",
+            populate: {
+                path: "academicFaculty",
+            },
+        });
+    }
+    if (role === "faculty") {
+        result = yield faculty_model_1.Faculty.findOne({ id: userId });
+    }
+    if (role === "admin") {
+        result = yield admin_model_1.Admin.findOne({ id: userId });
+    }
+    return result;
+});
 exports.UserServices = {
     createStudentIntoDB,
     createFacultyIntoDB,
     createAdminIntoDB,
+    getMeFromDB,
 };

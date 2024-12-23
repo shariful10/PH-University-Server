@@ -13,7 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserControllers = void 0;
+const AppError_1 = __importDefault(require("../../errors/AppError"));
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
+const httpStatusCode_1 = require("../../utils/httpStatusCode");
 const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
 const user_service_1 = require("./user.service");
 const createUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -40,8 +42,20 @@ const createAdmin = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, vo
         data: result,
     });
 }));
+const getMe = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const token = req.headers.authorization;
+    if (!token) {
+        throw new AppError_1.default(httpStatusCode_1.httpStatusCode.NOT_FOUND, "Token not found!");
+    }
+    const result = yield user_service_1.UserServices.getMeFromDB(token);
+    (0, sendResponse_1.default)(res, {
+        message: "User fetched successfully",
+        data: result,
+    });
+}));
 exports.UserControllers = {
     createUser,
     createFaculty,
     createAdmin,
+    getMe,
 };
