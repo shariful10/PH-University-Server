@@ -7,6 +7,7 @@ const academicSemester_route_1 = require("../modules/academicSemester/academicSe
 const admin_route_1 = require("../modules/Admin/admin.route");
 const auth_route_1 = require("../modules/Auth/auth.route");
 const course_route_1 = require("../modules/Course/course.route");
+const enrolledCourse_route_1 = require("../modules/EnrolledCourse/enrolledCourse.route");
 const faculty_route_1 = require("../modules/Faculty/faculty.route");
 const OfferedCourse_route_1 = require("../modules/OfferedCourse/OfferedCourse.route");
 const semesterRegistration_route_1 = require("../modules/semesterRegistration/semesterRegistration.route");
@@ -57,6 +58,10 @@ const moduleRoutes = [
     {
         path: "/auth",
         route: auth_route_1.AuthRoutes,
+    },
+    {
+        path: "/enrolled-courses",
+        route: enrolledCourse_route_1.EnrolledCourseRoutes,
     },
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));

@@ -1,6 +1,7 @@
 export const httpStatusCode = {
   OK: 200,
   CREATED: 201,
+  CONFLICT: 409,
   FORBIDDEN: 403,
   NOT_FOUND: 404,
   NO_CONTENT: 204,
