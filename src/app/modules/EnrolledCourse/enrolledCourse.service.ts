@@ -1,7 +1,9 @@
 import mongoose from "mongoose";
 import AppError from "../../errors/AppError";
 import { httpStatusCode } from "../../utils/httpStatusCode";
+import { Course } from "../Course/course.model";
 import { OfferedCourse } from "../OfferedCourse/OfferedCourse.model";
+import { SemesterRegistration } from "../semesterRegistration/semesterRegistration.model";
 import { Student } from "../student/student.model";
 import { TEnrolledCourse } from "./enrolledCourse.interface";
 import EnrolledCourse from "./enrolledCourse.model";
@@ -17,6 +19,8 @@ export const createEnrolledCourseIntoDB = async (
   if (!isOfferedCourseExists) {
     throw new AppError(httpStatusCode.NOT_FOUND, "Offered course not found!");
   }
+
+  const course = await Course.findById(isOfferedCourseExists.course);
 
   if (isOfferedCourseExists.maxCapacity <= 0) {
     throw new AppError(httpStatusCode.BAD_REQUEST, "Room is full!");
@@ -38,6 +42,60 @@ export const createEnrolledCourseIntoDB = async (
     throw new AppError(
       httpStatusCode.CONFLICT,
       "Student is already enrolled in this course!",
+    );
+  }
+
+  // Check total credits exceeds maxCredit
+  const semesterRegistration = await SemesterRegistration.findById(
+    isOfferedCourseExists.semesterRegistration,
+  ).select("maxCredit");
+
+  // Total enrolled credits + new enrolled course credit > maxCredit
+  const enrolledCourses = await EnrolledCourse.aggregate([
+    {
+      $match: {
+        semesterRegistration: isOfferedCourseExists.semesterRegistration,
+        student: student._id,
+      },
+    },
+    {
+      $lookup: {
+        from: "courses",
+        localField: "course",
+        foreignField: "_id",
+        as: "enrolledCourseData",
+      },
+    },
+    {
+      $unwind: "$enrolledCourseData",
+    },
+    {
+      $group: {
+        _id: null,
+        totalEnrolledCredits: {
+          $sum: "$enrolledCourseData.credits",
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        totalEnrolledCredits: 1,
+      },
+    },
+  ]);
+
+  const totalCredits =
+    enrolledCourses.length > 0 ? enrolledCourses[0].totalEnrolledCredits : 0;
+
+  if (
+    totalCredits &&
+    semesterRegistration?.maxCredit &&
+    totalCredits + course?.credits > semesterRegistration?.maxCredit
+  ) {
+    throw new AppError(
+      httpStatusCode.BAD_REQUEST,
+      "You have exceeds the maximum number of credits!",
     );
   }
 
