@@ -12,11 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.EnrolledCourseServices = exports.createEnrolledCourseIntoDB = void 0;
+exports.EnrolledCourseServices = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const AppError_1 = __importDefault(require("../../errors/AppError"));
 const httpStatusCode_1 = require("../../utils/httpStatusCode");
 const course_model_1 = require("../Course/course.model");
+const faculty_model_1 = require("../Faculty/faculty.model");
 const OfferedCourse_model_1 = require("../OfferedCourse/OfferedCourse.model");
 const semesterRegistration_model_1 = require("../semesterRegistration/semesterRegistration.model");
 const student_model_1 = require("../student/student.model");
@@ -27,7 +28,6 @@ const createEnrolledCourseIntoDB = (userId, payload) => __awaiter(void 0, void 0
     if (!isOfferedCourseExists) {
         throw new AppError_1.default(httpStatusCode_1.httpStatusCode.NOT_FOUND, "Offered course not found!");
     }
-    const course = yield course_model_1.Course.findById(isOfferedCourseExists.course);
     if (isOfferedCourseExists.maxCapacity <= 0) {
         throw new AppError_1.default(httpStatusCode_1.httpStatusCode.BAD_REQUEST, "Room is full!");
     }
@@ -44,7 +44,10 @@ const createEnrolledCourseIntoDB = (userId, payload) => __awaiter(void 0, void 0
         throw new AppError_1.default(httpStatusCode_1.httpStatusCode.CONFLICT, "Student is already enrolled in this course!");
     }
     // Check total credits exceeds maxCredit
+    const course = yield course_model_1.Course.findById(isOfferedCourseExists.course);
+    const currentCredit = course === null || course === void 0 ? void 0 : course.credits;
     const semesterRegistration = yield semesterRegistration_model_1.SemesterRegistration.findById(isOfferedCourseExists.semesterRegistration).select("maxCredit");
+    const maxCredit = semesterRegistration === null || semesterRegistration === void 0 ? void 0 : semesterRegistration.maxCredit;
     // Total enrolled credits + new enrolled course credit > maxCredit
     const enrolledCourses = yield enrolledCourse_model_1.default.aggregate([
         {
@@ -80,9 +83,7 @@ const createEnrolledCourseIntoDB = (userId, payload) => __awaiter(void 0, void 0
         },
     ]);
     const totalCredits = enrolledCourses.length > 0 ? enrolledCourses[0].totalEnrolledCredits : 0;
-    if (totalCredits &&
-        (semesterRegistration === null || semesterRegistration === void 0 ? void 0 : semesterRegistration.maxCredit) &&
-        totalCredits + (course === null || course === void 0 ? void 0 : course.credits) > (semesterRegistration === null || semesterRegistration === void 0 ? void 0 : semesterRegistration.maxCredit)) {
+    if (totalCredits && maxCredit && totalCredits + currentCredit > maxCredit) {
         throw new AppError_1.default(httpStatusCode_1.httpStatusCode.BAD_REQUEST, "You have exceeds the maximum number of credits!");
     }
     const session = yield mongoose_1.default.startSession();
@@ -116,7 +117,43 @@ const createEnrolledCourseIntoDB = (userId, payload) => __awaiter(void 0, void 0
         throw new AppError_1.default(httpStatusCode_1.httpStatusCode.INTERNAL_SERVER_ERROR, err instanceof Error ? err.message : "Something went wrong!");
     }
 });
-exports.createEnrolledCourseIntoDB = createEnrolledCourseIntoDB;
+const updateEnrolledCourseMarksIntoDB = (facultyId, payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const { semesterRegistration, offeredCourse, student, courseMarks } = payload;
+    const isSemesterRegistrationExists = yield semesterRegistration_model_1.SemesterRegistration.findById(semesterRegistration);
+    if (!isSemesterRegistrationExists) {
+        throw new AppError_1.default(httpStatusCode_1.httpStatusCode.NOT_FOUND, "Semester Registration not found!");
+    }
+    const isOfferedCourseExists = yield OfferedCourse_model_1.OfferedCourse.findById(offeredCourse);
+    if (!isOfferedCourseExists) {
+        throw new AppError_1.default(httpStatusCode_1.httpStatusCode.NOT_FOUND, "Offered course not found!");
+    }
+    const isStudentExists = yield student_model_1.Student.findById(student);
+    if (!isStudentExists) {
+        throw new AppError_1.default(httpStatusCode_1.httpStatusCode.NOT_FOUND, "Student not found!");
+    }
+    const faculty = yield faculty_model_1.Faculty.findOne({ id: facultyId }, { _id: 1 });
+    if (!faculty) {
+        throw new AppError_1.default(httpStatusCode_1.httpStatusCode.NOT_FOUND, "Faculty not found!");
+    }
+    const isTheCourseBelongToFaculty = yield enrolledCourse_model_1.default.findOne({
+        semesterRegistration,
+        offeredCourse,
+        student,
+        faculty: faculty._id,
+    });
+    if (!isTheCourseBelongToFaculty) {
+        throw new AppError_1.default(httpStatusCode_1.httpStatusCode.FORBIDDEN, "You are forbidden!");
+    }
+    const modifiedData = Object.assign({}, courseMarks);
+    if (courseMarks && Object.keys(courseMarks).length) {
+        for (const [key, value] of Object.entries(courseMarks)) {
+            modifiedData[`courseMarks.${key}`] = value;
+        }
+    }
+    const result = yield enrolledCourse_model_1.default.findByIdAndUpdate(isTheCourseBelongToFaculty._id, modifiedData, { new: true });
+    return result;
+});
 exports.EnrolledCourseServices = {
-    createEnrolledCourseIntoDB: exports.createEnrolledCourseIntoDB,
+    createEnrolledCourseIntoDB,
+    updateEnrolledCourseMarksIntoDB,
 };

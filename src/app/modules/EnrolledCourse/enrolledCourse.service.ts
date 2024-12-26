@@ -2,13 +2,14 @@ import mongoose from "mongoose";
 import AppError from "../../errors/AppError";
 import { httpStatusCode } from "../../utils/httpStatusCode";
 import { Course } from "../Course/course.model";
+import { Faculty } from "../Faculty/faculty.model";
 import { OfferedCourse } from "../OfferedCourse/OfferedCourse.model";
 import { SemesterRegistration } from "../semesterRegistration/semesterRegistration.model";
 import { Student } from "../student/student.model";
 import { TEnrolledCourse } from "./enrolledCourse.interface";
 import EnrolledCourse from "./enrolledCourse.model";
 
-export const createEnrolledCourseIntoDB = async (
+const createEnrolledCourseIntoDB = async (
   userId: string,
   payload: TEnrolledCourse,
 ) => {
@@ -19,8 +20,6 @@ export const createEnrolledCourseIntoDB = async (
   if (!isOfferedCourseExists) {
     throw new AppError(httpStatusCode.NOT_FOUND, "Offered course not found!");
   }
-
-  const course = await Course.findById(isOfferedCourseExists.course);
 
   if (isOfferedCourseExists.maxCapacity <= 0) {
     throw new AppError(httpStatusCode.BAD_REQUEST, "Room is full!");
@@ -46,9 +45,16 @@ export const createEnrolledCourseIntoDB = async (
   }
 
   // Check total credits exceeds maxCredit
+
+  const course = await Course.findById(isOfferedCourseExists.course);
+
+  const currentCredit = course?.credits;
+
   const semesterRegistration = await SemesterRegistration.findById(
     isOfferedCourseExists.semesterRegistration,
   ).select("maxCredit");
+
+  const maxCredit = semesterRegistration?.maxCredit;
 
   // Total enrolled credits + new enrolled course credit > maxCredit
   const enrolledCourses = await EnrolledCourse.aggregate([
@@ -88,11 +94,7 @@ export const createEnrolledCourseIntoDB = async (
   const totalCredits =
     enrolledCourses.length > 0 ? enrolledCourses[0].totalEnrolledCredits : 0;
 
-  if (
-    totalCredits &&
-    semesterRegistration?.maxCredit &&
-    totalCredits + course?.credits > semesterRegistration?.maxCredit
-  ) {
+  if (totalCredits && maxCredit && totalCredits + currentCredit > maxCredit) {
     throw new AppError(
       httpStatusCode.BAD_REQUEST,
       "You have exceeds the maximum number of credits!",
@@ -146,6 +148,71 @@ export const createEnrolledCourseIntoDB = async (
   }
 };
 
+const updateEnrolledCourseMarksIntoDB = async (
+  facultyId: string,
+  payload: Partial<TEnrolledCourse>,
+) => {
+  const { semesterRegistration, offeredCourse, student, courseMarks } = payload;
+
+  const isSemesterRegistrationExists =
+    await SemesterRegistration.findById(semesterRegistration);
+
+  if (!isSemesterRegistrationExists) {
+    throw new AppError(
+      httpStatusCode.NOT_FOUND,
+      "Semester Registration not found!",
+    );
+  }
+
+  const isOfferedCourseExists = await OfferedCourse.findById(offeredCourse);
+
+  if (!isOfferedCourseExists) {
+    throw new AppError(httpStatusCode.NOT_FOUND, "Offered course not found!");
+  }
+
+  const isStudentExists = await Student.findById(student);
+
+  if (!isStudentExists) {
+    throw new AppError(httpStatusCode.NOT_FOUND, "Student not found!");
+  }
+
+  const faculty = await Faculty.findOne({ id: facultyId }, { _id: 1 });
+
+  if (!faculty) {
+    throw new AppError(httpStatusCode.NOT_FOUND, "Faculty not found!");
+  }
+
+  const isTheCourseBelongToFaculty = await EnrolledCourse.findOne({
+    semesterRegistration,
+    offeredCourse,
+    student,
+    faculty: faculty._id,
+  });
+
+  if (!isTheCourseBelongToFaculty) {
+    throw new AppError(httpStatusCode.FORBIDDEN, "You are forbidden!");
+  }
+
+  const modifiedData: Record<string, unknown> = {
+    ...courseMarks,
+  };
+
+  if (courseMarks && Object.keys(courseMarks).length) {
+    for (const [key, value] of Object.entries(courseMarks)) {
+      modifiedData[`courseMarks.${key}`] = value;
+    }
+  }
+
+  const result = await EnrolledCourse.findByIdAndUpdate(
+    isTheCourseBelongToFaculty._id,
+    modifiedData,
+    { new: true },
+  );
+
+  return result;
+};
+
 export const EnrolledCourseServices = {
   createEnrolledCourseIntoDB,
+  updateEnrolledCourseMarksIntoDB,
 };
