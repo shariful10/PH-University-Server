@@ -14,7 +14,7 @@ const user_const_1 = require("./user.const");
 const user_controller_1 = require("./user.controller");
 const user_validation_1 = require("./user.validation");
 const router = express_1.default.Router();
-router.post("/create-student", (0, auth_1.default)(user_const_1.USER_ROLE.admin), sendImageToCloudinary_1.upload.single("file"), (req, res, next) => {
+router.post("/create-student", (0, auth_1.default)(user_const_1.USER_ROLE.superAdmin, user_const_1.USER_ROLE.admin), sendImageToCloudinary_1.upload.single("file"), (req, res, next) => {
     req.body = JSON.parse(req.body.data);
     next();
 }, 

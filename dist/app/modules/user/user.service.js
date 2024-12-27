@@ -37,8 +37,14 @@ const createStudentIntoDB = (file, password, payload) => __awaiter(void 0, void 
     // Find academic semester info
     const admissionSemester = yield academicSemester_model_1.AcademicSemester.findById(payload.admissionSemester);
     if (!admissionSemester) {
-        throw new AppError_1.default(httpStatusCode_1.httpStatusCode.BAD_REQUEST, "Admission semester not found");
+        throw new AppError_1.default(httpStatusCode_1.httpStatusCode.BAD_REQUEST, "Admission semester not found!");
     }
+    // Find department
+    const academicDepartment = yield academicDepartment_model_1.AcademicDepartment.findById(payload.academicDepartment);
+    if (!academicDepartment) {
+        throw new AppError_1.default(httpStatusCode_1.httpStatusCode.BAD_REQUEST, "Admission department not found!");
+    }
+    payload.academicFaculty = academicDepartment.academicFaculty;
     const session = yield mongoose_1.default.startSession();
     try {
         session.startTransaction();

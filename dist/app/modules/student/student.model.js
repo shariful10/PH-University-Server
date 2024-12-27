@@ -95,12 +95,14 @@ const studentSchema = new mongoose_1.Schema({
     admissionSemester: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "AcademicSemester",
-        required: true,
     },
     academicDepartment: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "AcademicDepartment",
-        required: true,
+    },
+    academicFaculty: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "AcademicFaculty",
     },
     isDeleted: { type: Boolean, default: false },
 }, { toJSON: { virtuals: true } });

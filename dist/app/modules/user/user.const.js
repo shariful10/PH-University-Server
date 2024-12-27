@@ -5,6 +5,6 @@ exports.USER_ROLE = {
     admin: "admin",
     student: "student",
     faculty: "faculty",
-    superAdmin: "super-admin",
+    superAdmin: "superAdmin",
 };
 exports.UserStatus = ["in-progress", "blocked"];
