@@ -12,5 +12,6 @@ const enrolledCourse_controller_1 = require("./enrolledCourse.controller");
 const enrolledCourse_validation_1 = require("./enrolledCourse.validation");
 const router = express_1.default.Router();
 router.post("/create-enrolled-course", (0, auth_1.default)(user_const_1.USER_ROLE.student), (0, validateRequest_1.default)(enrolledCourse_validation_1.EnrolledCourseValidations.createEnrolledCourseValidationZodSchema), enrolledCourse_controller_1.EnrolledCourseControllers.createEnrolledCourse);
+router.get("/my-enrolled-courses", (0, auth_1.default)(user_const_1.USER_ROLE.student), enrolledCourse_controller_1.EnrolledCourseControllers.getMyEnrolledCourses);
 router.patch("/update-enrolled-course-marks", (0, auth_1.default)(user_const_1.USER_ROLE.faculty), (0, validateRequest_1.default)(enrolledCourse_validation_1.EnrolledCourseValidations.updateEnrolledCourseMarksValidationZodSchema), enrolledCourse_controller_1.EnrolledCourseControllers.updateEnrolledCourse);
 exports.EnrolledCourseRoutes = router;

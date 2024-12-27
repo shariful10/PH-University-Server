@@ -17,4 +17,5 @@ export default {
   cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
   cloudinaryAPISecret: process.env.CLOUDINARY_API_SECRET,
   jwtRefreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
+  superAdminPassword: process.env.SUPER_ADMIN_PASSWORD,
 };

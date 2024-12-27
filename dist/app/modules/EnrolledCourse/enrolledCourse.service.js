@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EnrolledCourseServices = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
+const QueryBuilder_1 = __importDefault(require("../../builder/QueryBuilder"));
 const AppError_1 = __importDefault(require("../../errors/AppError"));
 const httpStatusCode_1 = require("../../utils/httpStatusCode");
 const course_model_1 = require("../Course/course.model");
@@ -118,6 +119,23 @@ const createEnrolledCourseIntoDB = (userId, payload) => __awaiter(void 0, void 0
         throw new AppError_1.default(httpStatusCode_1.httpStatusCode.INTERNAL_SERVER_ERROR, err instanceof Error ? err.message : "Something went wrong!");
     }
 });
+const getMyEnrolledCoursesFromDB = (studentId, query) => __awaiter(void 0, void 0, void 0, function* () {
+    const student = yield student_model_1.Student.findOne({ id: studentId });
+    if (!student) {
+        throw new AppError_1.default(httpStatusCode_1.httpStatusCode.NOT_FOUND, "Student not found !");
+    }
+    const enrolledCourseQuery = new QueryBuilder_1.default(enrolledCourse_model_1.default.find({ student: student._id }).populate("semesterRegistration academicSemester academicFaculty academicDepartment offeredCourse course student faculty"), query)
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
+    const result = yield enrolledCourseQuery.modelQuery;
+    const meta = yield enrolledCourseQuery.countTotal();
+    return {
+        meta,
+        result,
+    };
+});
 const updateEnrolledCourseMarksIntoDB = (facultyId, payload) => __awaiter(void 0, void 0, void 0, function* () {
     const { semesterRegistration, offeredCourse, student, courseMarks } = payload;
     const isSemesterRegistrationExists = yield semesterRegistration_model_1.SemesterRegistration.findById(semesterRegistration);
@@ -167,5 +185,6 @@ const updateEnrolledCourseMarksIntoDB = (facultyId, payload) => __awaiter(void 0
 });
 exports.EnrolledCourseServices = {
     createEnrolledCourseIntoDB,
+    getMyEnrolledCoursesFromDB,
     updateEnrolledCourseMarksIntoDB,
 };

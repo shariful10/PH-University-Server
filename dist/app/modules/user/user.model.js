@@ -25,7 +25,7 @@ const userSchema = new mongoose_1.Schema({
     passwordChangedAt: { type: Date },
     role: {
         type: String,
-        enum: ["admin", "student", "faculty"],
+        enum: ["super-admin", "admin", "student", "faculty"],
         required: true,
     },
     status: {

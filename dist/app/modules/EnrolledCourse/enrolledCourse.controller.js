@@ -24,6 +24,15 @@ const createEnrolledCourse = (0, catchAsync_1.default)((req, res) => __awaiter(v
         data: result,
     });
 }));
+const getMyEnrolledCourses = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const studentId = req.user.userId;
+    const result = yield enrolledCourse_service_1.EnrolledCourseServices.getMyEnrolledCoursesFromDB(studentId, req.query);
+    (0, sendResponse_1.default)(res, {
+        message: "Enrolled courses are retrieved successfully!",
+        meta: result.meta,
+        data: result.result,
+    });
+}));
 const updateEnrolledCourse = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const facultyId = req.user.userId;
     const result = yield enrolledCourse_service_1.EnrolledCourseServices.updateEnrolledCourseMarksIntoDB(facultyId, req.body);
@@ -34,5 +43,6 @@ const updateEnrolledCourse = (0, catchAsync_1.default)((req, res) => __awaiter(v
 }));
 exports.EnrolledCourseControllers = {
     createEnrolledCourse,
+    getMyEnrolledCourses,
     updateEnrolledCourse,
 };
