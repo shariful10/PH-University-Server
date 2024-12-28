@@ -43,8 +43,13 @@ const facultySchema = new Schema<TFaculty, FacultyModel>(
     profileImg: { type: String, default: "" },
     academicDepartment: {
       type: Schema.Types.ObjectId,
+      ref: "AcademicDepartment",
       required: true,
-      ref: "User",
+    },
+    academicFaculty: {
+      type: Schema.Types.ObjectId,
+      ref: "AcademicFaculty",
+      required: true,
     },
     isDeleted: { type: Boolean, default: false },
   },
@@ -55,12 +60,12 @@ const facultySchema = new Schema<TFaculty, FacultyModel>(
   },
 );
 
-// generating full name
+// Generating full name
 facultySchema.virtual("fullName").get(function () {
   return `${this?.name?.firstName} ${this?.name?.middleName} ${this?.name?.lastName}`;
 });
 
-// filter out deleted documents
+// Filter out deleted documents
 facultySchema.pre("find", function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
@@ -76,7 +81,7 @@ facultySchema.pre("aggregate", function (next) {
   next();
 });
 
-//checking if user is already exist!
+// Checking if user is already exist!
 facultySchema.statics.isUserExists = async function (id: string) {
   const existingUser = await Faculty.findOne({ id });
   return existingUser;

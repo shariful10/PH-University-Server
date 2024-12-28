@@ -96,6 +96,7 @@ const createFacultyIntoDB = (file, password, payload) => __awaiter(void 0, void 
     if (!academicDepartment) {
         throw new AppError_1.default(httpStatusCode_1.httpStatusCode.BAD_REQUEST, "Academic department not found");
     }
+    payload.academicFaculty = academicDepartment.academicFaculty;
     const session = yield mongoose_1.default.startSession();
     try {
         session.startTransaction();

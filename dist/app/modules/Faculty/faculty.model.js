@@ -51,8 +51,13 @@ const facultySchema = new mongoose_1.Schema({
     profileImg: { type: String, default: "" },
     academicDepartment: {
         type: mongoose_1.Schema.Types.ObjectId,
+        ref: "AcademicDepartment",
         required: true,
-        ref: "User",
+    },
+    academicFaculty: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "AcademicFaculty",
+        required: true,
     },
     isDeleted: { type: Boolean, default: false },
 }, {
@@ -60,12 +65,12 @@ const facultySchema = new mongoose_1.Schema({
         virtuals: true,
     },
 });
-// generating full name
+// Generating full name
 facultySchema.virtual("fullName").get(function () {
     var _a, _b, _c;
     return `${(_a = this === null || this === void 0 ? void 0 : this.name) === null || _a === void 0 ? void 0 : _a.firstName} ${(_b = this === null || this === void 0 ? void 0 : this.name) === null || _b === void 0 ? void 0 : _b.middleName} ${(_c = this === null || this === void 0 ? void 0 : this.name) === null || _c === void 0 ? void 0 : _c.lastName}`;
 });
-// filter out deleted documents
+// Filter out deleted documents
 facultySchema.pre("find", function (next) {
     this.find({ isDeleted: { $ne: true } });
     next();
@@ -78,7 +83,7 @@ facultySchema.pre("aggregate", function (next) {
     this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
     next();
 });
-//checking if user is already exist!
+// Checking if user is already exist!
 facultySchema.statics.isUserExists = function (id) {
     return __awaiter(this, void 0, void 0, function* () {
         const existingUser = yield exports.Faculty.findOne({ id });
