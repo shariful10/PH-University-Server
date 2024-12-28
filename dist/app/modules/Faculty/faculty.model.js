@@ -48,7 +48,7 @@ const facultySchema = new mongoose_1.Schema({
     },
     presentAddress: { type: String, required: true },
     permanentAddress: { type: String, required: true },
-    profileImg: { type: String },
+    profileImg: { type: String, default: "" },
     academicDepartment: {
         type: mongoose_1.Schema.Types.ObjectId,
         required: true,

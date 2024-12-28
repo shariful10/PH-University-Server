@@ -3,7 +3,7 @@ import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { UserServices } from "./user.service";
 
-const createUser = catchAsync(async (req, res) => {
+const createStudent = catchAsync(async (req, res) => {
   const { password, student: studentData } = req.body;
 
   const result = await UserServices.createStudentIntoDB(
@@ -21,7 +21,11 @@ const createUser = catchAsync(async (req, res) => {
 const createFaculty = catchAsync(async (req, res) => {
   const { password, faculty: facultyData } = req.body;
 
-  const result = await UserServices.createFacultyIntoDB(password, facultyData);
+  const result = await UserServices.createFacultyIntoDB(
+    req.file as TUploadedFile,
+    password,
+    facultyData,
+  );
 
   sendResponse(res, {
     message: "Faculty is created successfully",
@@ -32,7 +36,11 @@ const createFaculty = catchAsync(async (req, res) => {
 const createAdmin = catchAsync(async (req, res) => {
   const { password, admin: adminData } = req.body;
 
-  const result = await UserServices.createAdminIntoDB(password, adminData);
+  const result = await UserServices.createAdminIntoDB(
+    req.file as TUploadedFile,
+    password,
+    adminData,
+  );
 
   sendResponse(res, {
     message: "Admin is created successfully",
@@ -63,7 +71,7 @@ const getMe = catchAsync(async (req, res) => {
 });
 
 export const UserControllers = {
-  createUser,
+  createStudent,
   createFaculty,
   createAdmin,
   changeStatus,

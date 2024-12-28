@@ -50,10 +50,13 @@ const createStudentIntoDB = (file, password, payload) => __awaiter(void 0, void 
         session.startTransaction();
         // Set generated id
         userData.id = yield (0, user_utils_1.generateStudentId)(admissionSemester);
-        // Send image to Cloudinary
-        const imageName = `${userData === null || userData === void 0 ? void 0 : userData.id}${(_a = payload === null || payload === void 0 ? void 0 : payload.name) === null || _a === void 0 ? void 0 : _a.firstName}`;
-        const path = file === null || file === void 0 ? void 0 : file.path;
-        const { secure_url } = (yield (0, sendImageToCloudinary_1.sendImageToCloudinary)(imageName, path));
+        if (file) {
+            // Send image to Cloudinary
+            const imageName = `${userData === null || userData === void 0 ? void 0 : userData.id}${(_a = payload === null || payload === void 0 ? void 0 : payload.name) === null || _a === void 0 ? void 0 : _a.firstName}`;
+            const path = file === null || file === void 0 ? void 0 : file.path;
+            const { secure_url } = yield (0, sendImageToCloudinary_1.sendImageToCloudinary)(imageName, path);
+            payload.profileImg = secure_url;
+        }
         // Create a user
         const newUser = yield user_model_1.User.create([userData], { session });
         if (!newUser.length) {
@@ -64,7 +67,6 @@ const createStudentIntoDB = (file, password, payload) => __awaiter(void 0, void 
             // Set id, _id as user
             payload.id = newUser[0].id;
             payload.user = newUser[0]._id;
-            payload.profileImg = secure_url;
             const newStudent = yield student_model_1.Student.create([payload], { session });
             if (!newStudent.length) {
                 throw new AppError_1.default(httpStatusCode_1.httpStatusCode.BAD_REQUEST, "Failed to create student!");
@@ -80,7 +82,8 @@ const createStudentIntoDB = (file, password, payload) => __awaiter(void 0, void 
         throw new AppError_1.default(httpStatusCode_1.httpStatusCode.INTERNAL_SERVER_ERROR, err instanceof Error ? err.message : "Something went wrong!");
     }
 });
-const createFacultyIntoDB = (password, payload) => __awaiter(void 0, void 0, void 0, function* () {
+const createFacultyIntoDB = (file, password, payload) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     // Create a user object
     const userData = {};
     // If password is not given , use default password
@@ -98,6 +101,13 @@ const createFacultyIntoDB = (password, payload) => __awaiter(void 0, void 0, voi
         session.startTransaction();
         // Set generated id
         userData.id = yield (0, user_utils_1.generateFacultyId)();
+        if (file) {
+            // Send image to Cloudinary
+            const imageName = `${userData === null || userData === void 0 ? void 0 : userData.id}${(_a = payload === null || payload === void 0 ? void 0 : payload.name) === null || _a === void 0 ? void 0 : _a.firstName}`;
+            const path = file === null || file === void 0 ? void 0 : file.path;
+            const { secure_url } = yield (0, sendImageToCloudinary_1.sendImageToCloudinary)(imageName, path);
+            payload.profileImg = secure_url;
+        }
         // Create a user (transaction-1)
         const newUser = yield user_model_1.User.create([userData], { session }); // array
         //create a faculty
@@ -122,7 +132,8 @@ const createFacultyIntoDB = (password, payload) => __awaiter(void 0, void 0, voi
         throw new AppError_1.default(httpStatusCode_1.httpStatusCode.INTERNAL_SERVER_ERROR, err instanceof Error ? err.message : "Something went wrong!");
     }
 });
-const createAdminIntoDB = (password, payload) => __awaiter(void 0, void 0, void 0, function* () {
+const createAdminIntoDB = (file, password, payload) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     // Create a user object
     const userData = {};
     // If password is not given , use default password
@@ -135,6 +146,13 @@ const createAdminIntoDB = (password, payload) => __awaiter(void 0, void 0, void 
         session.startTransaction();
         //set  generated id
         userData.id = yield (0, user_utils_1.generateAdminId)();
+        if (file) {
+            // Send image to Cloudinary
+            const imageName = `${userData === null || userData === void 0 ? void 0 : userData.id}${(_a = payload === null || payload === void 0 ? void 0 : payload.name) === null || _a === void 0 ? void 0 : _a.firstName}`;
+            const path = file === null || file === void 0 ? void 0 : file.path;
+            const { secure_url } = yield (0, sendImageToCloudinary_1.sendImageToCloudinary)(imageName, path);
+            payload.profileImg = secure_url;
+        }
         // Create a user (transaction-1)
         const newUser = yield user_model_1.User.create([userData], { session });
         // Create a admin

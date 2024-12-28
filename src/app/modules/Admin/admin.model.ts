@@ -5,9 +5,8 @@ import { AdminModel, TAdmin, TUserName } from "./admin.interface";
 const userNameSchema = new Schema<TUserName>({
   firstName: {
     type: String,
-    required: [true, "First Name is required"],
+    required: true,
     trim: true,
-    maxlength: [20, "Name can not be more than 20 characters"],
   },
   middleName: {
     type: String,
@@ -75,7 +74,7 @@ const adminSchema = new Schema<TAdmin, AdminModel>(
       type: String,
       required: true,
     },
-    profileImg: { type: String },
+    profileImg: { type: String, default: "" },
     isDeleted: {
       type: Boolean,
       default: false,
@@ -88,12 +87,12 @@ const adminSchema = new Schema<TAdmin, AdminModel>(
   },
 );
 
-// generating full name
+// Generating full name
 adminSchema.virtual("fullName").get(function () {
   return `${this?.name?.firstName} ${this?.name?.middleName} ${this?.name?.lastName}`;
 });
 
-// filter out deleted documents
+// Filter out deleted documents
 adminSchema.pre("find", function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
@@ -109,7 +108,7 @@ adminSchema.pre("aggregate", function (next) {
   next();
 });
 
-//checking if user is already exist!
+// Checking if user is already exist!
 adminSchema.statics.isUserExists = async function (id: string) {
   const existingUser = await Admin.findOne({ id });
   return existingUser;

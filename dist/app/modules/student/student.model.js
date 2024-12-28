@@ -71,7 +71,7 @@ const studentSchema = new mongoose_1.Schema({
             message: "{VALUE} is not a valid email address",
         },
     },
-    profileImg: { type: String },
+    profileImg: { type: String, default: "" },
     gender: {
         type: String,
         enum: {
