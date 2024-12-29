@@ -15,11 +15,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.OfferedCourseServices = void 0;
 const QueryBuilder_1 = __importDefault(require("../../builder/QueryBuilder"));
 const AppError_1 = __importDefault(require("../../errors/AppError"));
+const httpStatusCode_1 = require("../../utils/httpStatusCode");
 const course_model_1 = require("../Course/course.model");
 const faculty_model_1 = require("../Faculty/faculty.model");
 const academicDepartment_model_1 = require("../academicDepartment/academicDepartment.model");
 const academicFaculty_model_1 = require("../academicFaculty/academicFaculty.model");
 const semesterRegistration_model_1 = require("../semesterRegistration/semesterRegistration.model");
+const student_model_1 = require("../student/student.model");
 const OfferedCourse_model_1 = require("./OfferedCourse.model");
 const OfferedCourse_utils_1 = require("./OfferedCourse.utils");
 const createOfferedCourseIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
@@ -87,7 +89,25 @@ const getAllOfferedCoursesFromDB = (query) => __awaiter(void 0, void 0, void 0, 
         .paginate()
         .fields();
     const result = yield offeredCourseQuery.modelQuery;
-    return result;
+    const meta = yield offeredCourseQuery.countTotal();
+    return {
+        meta,
+        result,
+    };
+});
+const getMyOfferedCoursesFromDB = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const student = yield student_model_1.Student.findOne({ id: userId });
+    if (!student) {
+        throw new AppError_1.default(httpStatusCode_1.httpStatusCode.NOT_FOUND, "User is not found");
+    }
+    // Find current ongoing semester
+    const currentOngoingSemester = yield semesterRegistration_model_1.SemesterRegistration.findOne({
+        status: "ONGOING",
+    });
+    if (!currentOngoingSemester) {
+        throw new AppError_1.default(httpStatusCode_1.httpStatusCode.NOT_FOUND, "Semester not found");
+    }
+    return currentOngoingSemester;
 });
 const getSingleOfferedCourseFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const offeredCourse = yield OfferedCourse_model_1.OfferedCourse.findById(id);
@@ -148,6 +168,7 @@ const deleteOfferedCourseFromDB = (id) => __awaiter(void 0, void 0, void 0, func
 exports.OfferedCourseServices = {
     createOfferedCourseIntoDB,
     getAllOfferedCoursesFromDB,
+    getMyOfferedCoursesFromDB,
     getSingleOfferedCourseFromDB,
     deleteOfferedCourseFromDB,
     updateOfferedCourseIntoDB,

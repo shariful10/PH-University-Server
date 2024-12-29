@@ -1,10 +1,12 @@
 import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../errors/AppError";
+import { httpStatusCode } from "../../utils/httpStatusCode";
 import { Course } from "../Course/course.model";
 import { Faculty } from "../Faculty/faculty.model";
 import { AcademicDepartment } from "../academicDepartment/academicDepartment.model";
 import { AcademicFaculty } from "../academicFaculty/academicFaculty.model";
 import { SemesterRegistration } from "../semesterRegistration/semesterRegistration.model";
+import { Student } from "../student/student.model";
 import { TOfferedCourse } from "./OfferedCourse.interface";
 import { OfferedCourse } from "./OfferedCourse.model";
 import { hasTimeConflict } from "./OfferedCourse.utils";
@@ -122,7 +124,31 @@ const getAllOfferedCoursesFromDB = async (query: Record<string, unknown>) => {
     .fields();
 
   const result = await offeredCourseQuery.modelQuery;
-  return result;
+  const meta = await offeredCourseQuery.countTotal();
+
+  return {
+    meta,
+    result,
+  };
+};
+
+const getMyOfferedCoursesFromDB = async (userId: string) => {
+  const student = await Student.findOne({ id: userId });
+
+  if (!student) {
+    throw new AppError(httpStatusCode.NOT_FOUND, "User is not found");
+  }
+
+  // Find current ongoing semester
+  const currentOngoingSemester = await SemesterRegistration.findOne({
+    status: "ONGOING",
+  });
+
+  if (!currentOngoingSemester) {
+    throw new AppError(httpStatusCode.NOT_FOUND, "Semester not found");
+  }
+
+  return currentOngoingSemester;
 };
 
 const getSingleOfferedCourseFromDB = async (id: string) => {
@@ -220,6 +246,7 @@ const deleteOfferedCourseFromDB = async (id: string) => {
 export const OfferedCourseServices = {
   createOfferedCourseIntoDB,
   getAllOfferedCoursesFromDB,
+  getMyOfferedCoursesFromDB,
   getSingleOfferedCourseFromDB,
   deleteOfferedCourseFromDB,
   updateOfferedCourseIntoDB,
