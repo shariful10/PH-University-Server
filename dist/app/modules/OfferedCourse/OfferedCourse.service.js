@@ -158,20 +158,27 @@ const getMyOfferedCoursesFromDB = (userId) => __awaiter(void 0, void 0, void 0, 
                 as: "enrolledCourses",
             },
         },
-        // {
-        //   $addFields: {
-        //     $in: [
-        //       "course._id",
-        //       {
-        //         $map: {
-        //           input: "$course",
-        //           as: "course",
-        //           in: "$$course._id",
-        //         },
-        //       },
-        //     ],
-        //   },
-        // },
+        {
+            $addFields: {
+                isAlreadyEnrolled: {
+                    $in: [
+                        "$course._id",
+                        {
+                            $map: {
+                                input: "$enrolledCourses",
+                                as: "enroll",
+                                in: "$$enroll.course",
+                            },
+                        },
+                    ],
+                },
+            },
+        },
+        {
+            $match: {
+                isAlreadyEnrolled: false,
+            },
+        },
     ]);
     return result;
 });
