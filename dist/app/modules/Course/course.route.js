@@ -17,5 +17,6 @@ router.get("/:id", (0, auth_1.default)(user_const_1.USER_ROLE.superAdmin, user_c
 router.delete("/:id", (0, auth_1.default)(user_const_1.USER_ROLE.superAdmin, user_const_1.USER_ROLE.admin), course_controller_1.CourseControllers.deleteCourse);
 router.patch("/:id", (0, auth_1.default)(user_const_1.USER_ROLE.superAdmin, user_const_1.USER_ROLE.admin), course_controller_1.CourseControllers.updateCourse);
 router.put("/:courseId/assign-faculties", (0, auth_1.default)(user_const_1.USER_ROLE.superAdmin, user_const_1.USER_ROLE.admin), (0, validateRequest_1.default)(course_validation_1.CourseValidations.facultiesWithCourseValidationSchema), course_controller_1.CourseControllers.assignFacultiesWithCourse);
+router.get("/:courseId/get-faculties", (0, auth_1.default)(user_const_1.USER_ROLE.superAdmin, user_const_1.USER_ROLE.admin, user_const_1.USER_ROLE.faculty, user_const_1.USER_ROLE.student), course_controller_1.CourseControllers.getFacultiesWithCourse);
 router.delete("/:courseId/remove-faculties", (0, auth_1.default)(user_const_1.USER_ROLE.superAdmin, user_const_1.USER_ROLE.admin), (0, validateRequest_1.default)(course_validation_1.CourseValidations.facultiesWithCourseValidationSchema), course_controller_1.CourseControllers.removeFacultiesFromCourse);
 exports.CourseRoutes = router;

@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../errors/AppError";
+import { httpStatusCode } from "../../utils/httpStatusCode";
 import { courseSearchableFields } from "./course.const";
 import { TCourse, TCourseFaculty } from "./course.interface";
 import { Course, CourseFaculty } from "./course.model";
@@ -31,7 +32,7 @@ const getSingleCourseFromDB = async (id: string) => {
   );
 
   if (!result) {
-    throw new AppError(404, "Course not found!");
+    throw new AppError(httpStatusCode.NOT_FOUND, "Course not found!");
   }
 
   return result;
@@ -45,7 +46,7 @@ const deleteCourseFromDB = async (id: string) => {
   );
 
   if (!result) {
-    throw new AppError(404, "Course not found!");
+    throw new AppError(httpStatusCode.NOT_FOUND, "Course not found!");
   }
 
   return result;
@@ -70,7 +71,10 @@ const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
     );
 
     if (!updatedBasicCourseInfo) {
-      throw new AppError(400, "Failed to update course!");
+      throw new AppError(
+        httpStatusCode.BAD_REQUEST,
+        "Failed to update course!",
+      );
     }
 
     // check if there is any pre requisite courses to update
@@ -157,6 +161,18 @@ const assignFacultiesWithCourseIntoDB = async (
   return result;
 };
 
+const getFacultiesWithCourseFromDB = async (courseId: string) => {
+  const result = await CourseFaculty.findOne({ course: courseId }).populate(
+    "faculties",
+  );
+
+  if (!result) {
+    throw new AppError(httpStatusCode.NOT_FOUND, "Faculties not found!");
+  }
+
+  return result;
+};
+
 const removeFacultiesFromCourseFromDB = async (
   id: string,
   payload: Partial<TCourseFaculty>,
@@ -181,5 +197,6 @@ export const CourseServices = {
   deleteCourseFromDB,
   updateCourseIntoDB,
   assignFacultiesWithCourseIntoDB,
+  getFacultiesWithCourseFromDB,
   removeFacultiesFromCourseFromDB,
 };

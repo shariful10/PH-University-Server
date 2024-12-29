@@ -27,6 +27,7 @@ exports.CourseServices = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const QueryBuilder_1 = __importDefault(require("../../builder/QueryBuilder"));
 const AppError_1 = __importDefault(require("../../errors/AppError"));
+const httpStatusCode_1 = require("../../utils/httpStatusCode");
 const course_const_1 = require("./course.const");
 const course_model_1 = require("./course.model");
 const createCourseIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
@@ -46,14 +47,14 @@ const getAllCoursesFromDB = (query) => __awaiter(void 0, void 0, void 0, functio
 const getSingleCourseFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield course_model_1.Course.findById(id).populate("preRequisiteCourses.course");
     if (!result) {
-        throw new AppError_1.default(404, "Course not found!");
+        throw new AppError_1.default(httpStatusCode_1.httpStatusCode.NOT_FOUND, "Course not found!");
     }
     return result;
 });
 const deleteCourseFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield course_model_1.Course.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
     if (!result) {
-        throw new AppError_1.default(404, "Course not found!");
+        throw new AppError_1.default(httpStatusCode_1.httpStatusCode.NOT_FOUND, "Course not found!");
     }
     return result;
 });
@@ -69,7 +70,7 @@ const updateCourseIntoDB = (id, payload) => __awaiter(void 0, void 0, void 0, fu
             session,
         });
         if (!updatedBasicCourseInfo) {
-            throw new AppError_1.default(400, "Failed to update course!");
+            throw new AppError_1.default(httpStatusCode_1.httpStatusCode.BAD_REQUEST, "Failed to update course!");
         }
         // check if there is any pre requisite courses to update
         if (preRequisiteCourses && preRequisiteCourses.length > 0) {
@@ -123,6 +124,13 @@ const assignFacultiesWithCourseIntoDB = (id, payload) => __awaiter(void 0, void 
     });
     return result;
 });
+const getFacultiesWithCourseFromDB = (courseId) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield course_model_1.CourseFaculty.findOne({ course: courseId }).populate("faculties");
+    if (!result) {
+        throw new AppError_1.default(httpStatusCode_1.httpStatusCode.NOT_FOUND, "Faculties not found!");
+    }
+    return result;
+});
 const removeFacultiesFromCourseFromDB = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield course_model_1.CourseFaculty.findByIdAndUpdate(id, {
         $pull: { faculties: { $in: payload } },
@@ -138,5 +146,6 @@ exports.CourseServices = {
     deleteCourseFromDB,
     updateCourseIntoDB,
     assignFacultiesWithCourseIntoDB,
+    getFacultiesWithCourseFromDB,
     removeFacultiesFromCourseFromDB,
 };
