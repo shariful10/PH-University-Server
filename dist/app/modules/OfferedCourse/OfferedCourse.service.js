@@ -101,13 +101,30 @@ const getMyOfferedCoursesFromDB = (userId) => __awaiter(void 0, void 0, void 0, 
         throw new AppError_1.default(httpStatusCode_1.httpStatusCode.NOT_FOUND, "User is not found");
     }
     // Find current ongoing semester
-    const currentOngoingSemester = yield semesterRegistration_model_1.SemesterRegistration.findOne({
+    const currentOngoingRegistrationSemester = yield semesterRegistration_model_1.SemesterRegistration.findOne({
         status: "ONGOING",
     });
-    if (!currentOngoingSemester) {
-        throw new AppError_1.default(httpStatusCode_1.httpStatusCode.NOT_FOUND, "Semester not found");
+    if (!currentOngoingRegistrationSemester) {
+        throw new AppError_1.default(httpStatusCode_1.httpStatusCode.NOT_FOUND, "There is no ongoing semester registration!");
     }
-    return currentOngoingSemester;
+    const result = yield OfferedCourse_model_1.OfferedCourse.aggregate([
+        {
+            $match: {
+                semesterRegistration: currentOngoingRegistrationSemester === null || currentOngoingRegistrationSemester === void 0 ? void 0 : currentOngoingRegistrationSemester._id,
+                academicFaculty: student.academicFaculty,
+                academicDepartment: student.academicDepartment,
+            },
+        },
+        {
+            $lookup: {
+                from: "courses",
+                localField: "course",
+                foreignField: "_id",
+                as: "course",
+            },
+        },
+    ]);
+    return result;
 });
 const getSingleOfferedCourseFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const offeredCourse = yield OfferedCourse_model_1.OfferedCourse.findById(id);
