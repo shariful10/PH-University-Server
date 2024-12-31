@@ -159,7 +159,54 @@ const getMyOfferedCoursesFromDB = (userId) => __awaiter(void 0, void 0, void 0, 
             },
         },
         {
+            $lookup: {
+                from: "enrolledcourses",
+                let: {
+                    currentStudent: student._id,
+                },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $and: [
+                                    {
+                                        $eq: ["$student", "$$currentStudent"],
+                                    },
+                                    {
+                                        $eq: ["$isCompleted", true],
+                                    },
+                                ],
+                            },
+                        },
+                    },
+                ],
+                as: "completedCourses",
+            },
+        },
+        {
             $addFields: {
+                completedCourseIds: {
+                    $map: {
+                        input: "$completedCourses",
+                        as: "completed",
+                        in: "$$completed.course",
+                    },
+                },
+            },
+        },
+        {
+            $addFields: {
+                isPreRequisitesFulfilled: {
+                    $or: [
+                        { $eq: ["$course.preRequisiteCourses", []] },
+                        {
+                            $setIsSubset: [
+                                "$course.preRequisiteCourses.course",
+                                "$completedCourseIds",
+                            ],
+                        },
+                    ],
+                },
                 isAlreadyEnrolled: {
                     $in: [
                         "$course._id",
@@ -177,6 +224,7 @@ const getMyOfferedCoursesFromDB = (userId) => __awaiter(void 0, void 0, void 0, 
         {
             $match: {
                 isAlreadyEnrolled: false,
+                isPreRequisitesFulfilled: true,
             },
         },
     ]);

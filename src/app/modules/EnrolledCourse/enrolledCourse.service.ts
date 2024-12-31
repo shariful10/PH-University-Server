@@ -11,7 +11,6 @@ import { TEnrolledCourse } from "./enrolledCourse.interface";
 import EnrolledCourse from "./enrolledCourse.model";
 import { calculateGradeAndPoints } from "./enrolledCourse.utils";
 
-// Create enrolled course into database
 const createEnrolledCourseIntoDB = async (
   userId: string,
   payload: TEnrolledCourse,
