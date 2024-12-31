@@ -13,15 +13,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AcademicDepartmentServices = void 0;
+const QueryBuilder_1 = __importDefault(require("../../builder/QueryBuilder"));
 const AppError_1 = __importDefault(require("../../errors/AppError"));
 const academicDepartment_model_1 = require("./academicDepartment.model");
+const academicDepartments_constant_1 = require("./academicDepartments.constant");
 const createAcademicDepartmentIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield academicDepartment_model_1.AcademicDepartment.create(payload);
     return result;
 });
-const getAllAcademicFDepartmentsFromDB = () => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield academicDepartment_model_1.AcademicDepartment.find().populate("academicFaculty");
-    return result;
+const getAllAcademicFDepartmentsFromDB = (query) => __awaiter(void 0, void 0, void 0, function* () {
+    const academicDepartmentQuery = new QueryBuilder_1.default(academicDepartment_model_1.AcademicDepartment.find().populate("academicFaculty"), query)
+        .search(academicDepartments_constant_1.AcademicDepartmentSearchableFields)
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
+    const result = yield academicDepartmentQuery.modelQuery;
+    const meta = yield academicDepartmentQuery.countTotal();
+    return {
+        meta,
+        result,
+    };
 });
 const getSingleAcademicDepartmentFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield academicDepartment_model_1.AcademicDepartment.findById(id).populate("academicFaculty");

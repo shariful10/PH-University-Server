@@ -32,7 +32,7 @@ const getAllOfferedCourses = (0, catchAsync_1.default)((req, res) => __awaiter(v
 }));
 const getMyOfferedCourses = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.user.userId;
-    const result = yield OfferedCourse_service_1.OfferedCourseServices.getMyOfferedCoursesFromDB(userId);
+    const result = yield OfferedCourse_service_1.OfferedCourseServices.getMyOfferedCoursesFromDB(userId, req.query);
     (0, sendResponse_1.default)(res, {
         message: "My Offered Courses are retrieved successfully!",
         data: result,
