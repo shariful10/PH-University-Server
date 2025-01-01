@@ -27,7 +27,8 @@ const getAllAcademicDepartments = (0, catchAsync_1.default)((req, res) => __awai
     const result = yield academicDepartment_service_1.AcademicDepartmentServices.getAllAcademicFDepartmentsFromDB(req.query);
     (0, sendResponse_1.default)(res, {
         message: "Academic department are retrieved successfully",
-        data: result,
+        meta: result.meta,
+        data: result.result,
     });
 }));
 const getSingleAcademicDepartment = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {

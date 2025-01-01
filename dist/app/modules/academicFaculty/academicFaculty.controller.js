@@ -24,10 +24,11 @@ const createAcademicFaculty = (0, catchAsync_1.default)((req, res) => __awaiter(
     });
 }));
 const getAllAcademicFaculties = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield academicFaculty_service_1.AcademicFacultyServices.getAllAcademicFacultiesFromDB();
+    const result = yield academicFaculty_service_1.AcademicFacultyServices.getAllAcademicFacultiesFromDB(req.query);
     (0, sendResponse_1.default)(res, {
         message: "Academic faculties are retrieved successfully",
-        data: result,
+        meta: result.meta,
+        data: result.result,
     });
 }));
 const getSingleAcademicFaculty = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {

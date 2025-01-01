@@ -35,19 +35,18 @@ const getAllStudentsFromDB = (query) => __awaiter(void 0, void 0, void 0, functi
     const studentQuery = new QueryBuilder_1.default(student_model_1.Student.find()
         .populate("user")
         .populate("admissionSemester")
-        .populate({
-        path: "academicDepartment",
-        populate: {
-            path: "academicFaculty",
-        },
-    }), query)
+        .populate("academicDepartment academicFaculty"), query)
         .search(student_const_1.searchableFields)
         .filter()
         .sort()
         .paginate()
         .fields();
+    const meta = yield studentQuery.countTotal();
     const result = yield studentQuery.modelQuery;
-    return result;
+    return {
+        meta,
+        result,
+    };
 });
 const getSingleStudentFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield student_model_1.Student.findById(id)

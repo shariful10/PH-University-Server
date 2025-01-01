@@ -20,7 +20,8 @@ const getAllStudents = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
     const result = yield student_service_1.StudentServices.getAllStudentsFromDB(req.query);
     (0, sendResponse_1.default)(res, {
         message: "Student are retrieved successfully",
-        data: result,
+        meta: result.meta,
+        data: result.result,
     });
 }));
 const getSingleStudent = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {

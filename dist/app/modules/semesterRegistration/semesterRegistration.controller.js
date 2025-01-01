@@ -27,7 +27,8 @@ const getAllSemesterRegistrations = (0, catchAsync_1.default)((req, res) => __aw
     const result = yield semesterRegistration_service_1.SemesterRegistrationService.getAllSemesterRegistrationsFromDB(req.query);
     (0, sendResponse_1.default)(res, {
         message: "Semester Registration are retrieved successfully !",
-        data: result,
+        meta: result.meta,
+        data: result.result,
     });
 }));
 const getSingleSemesterRegistration = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {

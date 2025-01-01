@@ -7,7 +7,8 @@ const getAllStudents = catchAsync(async (req, res) => {
 
   sendResponse(res, {
     message: "Student are retrieved successfully",
-    data: result,
+    meta: result.meta,
+    data: result.result,
   });
 });
 

@@ -28,7 +28,8 @@ const getAllAdmins = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
     const result = yield admin_service_1.AdminServices.getAllAdminsFromDB(req.query);
     (0, sendResponse_1.default)(res, {
         message: "Admins are retrieved successfully",
-        data: result,
+        meta: result.meta,
+        data: result.result,
     });
 }));
 const updateAdmin = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {

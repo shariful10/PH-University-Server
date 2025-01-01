@@ -28,7 +28,8 @@ const getAllFaculties = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
     const result = yield faculty_service_1.FacultyServices.getAllFacultiesFromDB(req.query);
     (0, sendResponse_1.default)(res, {
         message: "Faculties are retrieved successfully!",
-        data: result,
+        meta: result.meta,
+        data: result.result,
     });
 }));
 const updateFaculty = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {

@@ -20,7 +20,8 @@ const getAllOfferedCourses = catchAsync(async (req, res) => {
 
   sendResponse(res, {
     message: "Offered Courses are retrieved successfully!",
-    data: result,
+    meta: result.meta,
+    data: result.result,
   });
 });
 
@@ -34,7 +35,8 @@ const getMyOfferedCourses = catchAsync(async (req, res) => {
 
   sendResponse(res, {
     message: "My Offered Courses are retrieved successfully!",
-    data: result,
+    meta: result.meta,
+    data: result.result,
   });
 });
 
